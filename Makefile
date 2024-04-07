@@ -25,7 +25,7 @@ os.iso: kernel.elf
 				iso
 
 run: os.iso
-	qemu-system-i386 -boot d -cdrom os.iso -m 512
+	qemu-system-i386 -boot d -cdrom os.iso -m 512 -no-reboot -s &
 
 %.o: %.c
 	$(CC) $(CFLAGS)  $< -o $@
@@ -34,4 +34,4 @@ run: os.iso
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o kernel.elf os.iso
+	rm -rf *.o kernel.elf os.iso iso/boot/kernel.elf
