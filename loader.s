@@ -17,10 +17,16 @@ align 4                         ; the code must be 4 byte aligned
     dd FLAGS                    ; the flags,
     dd CHECKSUM                 ; and the checksum
 
-mov esp, kernel_stack + KERNEL_STACK_SIZE ; point esp to the start of the stack
+extern kmain
 
 loader:                         ; the loader label (defined as entry point in linker script)
     mov eax, 0xCAFEBABE         ; place the number 0xCAFEBABE in the register eax
-    ; mov 0xb800, [t]
+
+start:
+    CLI
+    mov esp, kernel_stack + KERNEL_STACK_SIZE ; point esp to the start of the stack
+    CALL kmain
+    HLT
+
 .loop:
     jmp .loop                   ; loop forever

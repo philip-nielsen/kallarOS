@@ -1,7 +1,7 @@
 OBJECTS = loader.o kmain.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
-		 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
+		 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c -g
 LDFLAGS = -T link.ld -melf_i386
 AS = nasm
 ASFLAGS = -f elf
@@ -25,7 +25,7 @@ os.iso: kernel.elf
 				iso
 
 run: os.iso
-	qemu-system-i386 -boot d -cdrom os.iso -m 512 -no-reboot -s &
+	qemu-system-i386 -boot d -cdrom os.iso -m 512 -no-reboot -s
 
 %.o: %.c
 	$(CC) $(CFLAGS)  $< -o $@
