@@ -39,4 +39,12 @@ void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg);
  */
 void fb_move_cursor(unsigned short pos);
 
+/** write_chars
+ *  Write the array of chars to the framebuffer at the given postion, and moves the cursor to the end of the chars.
+ *
+ * @param chars The array of character
+ * @param pos   The location in the framebuffer
+*/
+void write_chars(char* chars, unsigned int pos);
+
 #endif /* INCLUDE_IO_H */

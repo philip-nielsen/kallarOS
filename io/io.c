@@ -15,10 +15,18 @@ void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg) {
 }
 
 void outb(unsigned short port, unsigned char data) {
-  __asm__(
-    mov al, [esp + 8]    ; Move the data byte from the stack to AL register
-    mov dx, [esp + 4]    ; Move the address of the I/O port from the stack to DX register
-    out dx, al           ; Send the data byte to the I/O port specified by DX
-    ret                  ; Return from the function
-  )
+  __asm__ volatile (
+    "outb %1, %0"
+    :
+    : "dN"(port), "a"(data)
+  );
+}
+
+void write_chars(char* chars, unsigned int pos) {
+  int len = 0;
+  while (chars[len]) {
+    fb_write_cell(pos + len, chars[len], 0, 15);
+    len += 1;
+  } 
+  fb_move_cursor(len + pos);
 }

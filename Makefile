@@ -34,4 +34,4 @@ run: os.iso
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o kernel.elf os.iso iso/boot/kernel.elf
+	rm -rf *.o kernel.elf os.iso iso/boot/kernel.elf io/*.o
