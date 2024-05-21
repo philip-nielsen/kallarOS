@@ -22,11 +22,11 @@ void outb(unsigned short port, unsigned char data) {
   );
 }
 
-void write_chars(char* chars, unsigned int pos) {
+void write_chars(char chars[], unsigned int pos) {
   int len = 0;
   while (chars[len]) {
-    fb_write_cell(pos + len, chars[len], 0, 15);
+    fb_write_cell(pos + (len*2), chars[len], 0, 0x0F);
     len += 1;
   } 
-  fb_move_cursor(len + pos);
+  fb_move_cursor(pos/2 + len);
 }

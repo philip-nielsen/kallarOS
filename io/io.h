@@ -45,6 +45,6 @@ void fb_move_cursor(unsigned short pos);
  * @param chars The array of character
  * @param pos   The location in the framebuffer
 */
-void write_chars(char* chars, unsigned int pos);
+void write_chars(char chars[], unsigned int pos);
 
 #endif /* INCLUDE_IO_H */
