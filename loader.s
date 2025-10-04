@@ -20,7 +20,6 @@ align 4                         ; the code must be 4 byte aligned
 extern kmain
 
 loader:                         ; the loader label (defined as entry point in linker script)
-    mov eax, 0xCAFEBABE         ; place the number 0xCAFEBABE in the register eax
 
 start:
     CLI

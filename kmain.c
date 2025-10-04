@@ -1,4 +1,5 @@
 #include "io/io.h"
+#include "gdt/gdt.h"
 
 
 int kmain() {
@@ -8,5 +9,6 @@ int kmain() {
     char test[] = "Potatis";
     // char te[] = "A";
     write_chars(test, 50);
+    initGdt();
     return 0;
-}
+}   
