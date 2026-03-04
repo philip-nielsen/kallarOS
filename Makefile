@@ -1,4 +1,4 @@
-OBJECTS = loader.o kmain.o src/io.o src/gdt.o src/gdts.o src/idts.o src/idt.o 
+OBJECTS = loader.o kmain.o src/io.o src/gdt.o src/gdts.o src/idts.o src/idt.o src/pic.o src/drivers/keyboard.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 		 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c -g

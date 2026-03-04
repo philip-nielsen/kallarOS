@@ -1,4 +1,9 @@
 #include "idt.h"
+#include "pic.h"
+#include "drivers/keyboard.h"
+#include "io.h"
+
+extern void irq_stub_1(void);
 
 static bool vectors[256];
 
@@ -10,7 +15,7 @@ static idtr_t idtr;
 
 void exception_handler() {
     __asm__ volatile ("cli; hlt"); // Completely hangs the computer
-    while (1);
+    while (1); // To stop the compiler from complaining :)
 }
 
 void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {
@@ -32,6 +37,21 @@ void idt_init() {
         vectors[vector] = true;
     }
 
-    __asm__ volatile ("lidt %0" : : "m"(idtr)); // Load the newd IDT
+    pic_remap(0x20, 0x28); // Start Master interrupts at IDT index 32 (0x20), and Slave interrupts at IDT index 40 (0x28)
+
+    idt_set_descriptor(33, irq_stub_1, 0x8E);
+
+    __asm__ volatile ("lidt %0" : : "m"(idtr)); // Load the new IDT
+
+    inb(0x60);
+    
     __asm__ volatile ("sti"); // set the new interrupt flag
+}
+
+void irq_handler(uint32_t irq) {
+    if (irq == 1) {
+        keyboard_handler();
+    }
+
+    outb(0x20, 0x20);
 }

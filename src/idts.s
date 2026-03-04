@@ -51,3 +51,21 @@ isr_stub_table:
     dd isr_stub_%+i ;
 %assign i i+1 
 %endrep
+
+extern irq_handler
+
+%macro irq_stub 1
+global irq_stub_%+%1
+irq_stub_%+%1:
+    pushad
+
+    push %1
+    call irq_handler
+    add esp, 4
+
+    popad
+    iret
+%endmacro
+
+irq_stub 0
+irq_stub 1
