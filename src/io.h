@@ -1,3 +1,4 @@
+#include "stdint.h"
 #ifndef INCLUDE_IO_H
 #define INCLUDE_IO_H
 
@@ -46,5 +47,13 @@ void fb_move_cursor(unsigned short pos);
  * @param pos   The location in the framebuffer
 */
 void write_chars(char chars[], unsigned int pos);
+
+/** inb:
+ * Reads a byte from the given I/O port.
+ *
+ * @param port The I/O port to read from
+ * @return The byte read from the port
+ */
+uint8_t inb(unsigned short port);
 
 #endif /* INCLUDE_IO_H */

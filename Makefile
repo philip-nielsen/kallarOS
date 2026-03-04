@@ -1,4 +1,4 @@
-OBJECTS = loader.o kmain.o io/io.o gdt/gdt.o gdt/gdts.o
+OBJECTS = loader.o kmain.o src/io.o src/gdt.o src/gdts.o src/idts.o src/idt.o 
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 		 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c -g
@@ -34,4 +34,4 @@ run: os.iso
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o kernel.elf os.iso iso/boot/kernel.elf io/*.o gdt/*.o
+	rm -rf *.o kernel.elf os.iso iso/boot/kernel.elf src/*.o

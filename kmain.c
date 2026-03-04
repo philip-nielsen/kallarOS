@@ -1,5 +1,6 @@
-#include "io/io.h"
-#include "gdt/gdt.h"
+#include "src/io.h"
+#include "src/gdt.h"
+#include "src/idt.h"
 
 
 int kmain() {
@@ -10,5 +11,6 @@ int kmain() {
     // char te[] = "A";
     write_chars(test, 50);
     initGdt();
+    idt_init();
     return 0;
 }   

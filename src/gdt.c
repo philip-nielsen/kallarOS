@@ -1,5 +1,4 @@
 #include "gdt.h"
-#include "../stdint.h"
 
 extern void gdt_flush(struct gdt_ptr_struct* addr_t);
 
