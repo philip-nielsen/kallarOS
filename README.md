@@ -1,1 +1,1 @@
-Just a fun hobby project to try to create my own lite OS.
+Just a fun hobby project to try to create my own little OS.
