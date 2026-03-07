@@ -1,15 +1,18 @@
 OBJECTS = loader.o kmain.o src/io.o src/gdt.o src/gdts.o src/idts.o src/idt.o src/pic.o src/drivers/keyboard.o
-CC = gcc
-CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
-		 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c -g
-LDFLAGS = -T link.ld -melf_i386
+
+CC = i686-elf-gcc
+
+CFLAGS = -ffreestanding -Wall -Wextra -Werror -c -g
+
+LDFLAGS = -T link.ld -nostdlib
+
 AS = nasm
 ASFLAGS = -f elf
 
 all: kernel.elf
 
 kernel.elf: $(OBJECTS)
-	ld $(LDFLAGS) $(OBJECTS) -o kernel.elf
+	$(CC) $(LDFLAGS) $(OBJECTS) -o kernel.elf -lgcc
 
 os.iso: kernel.elf
 	cp kernel.elf iso/boot/kernel.elf
@@ -28,10 +31,10 @@ run: os.iso
 	qemu-system-i386 -boot d -cdrom os.iso -m 512 -no-reboot -s
 
 %.o: %.c
-	$(CC) $(CFLAGS)  $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o kernel.elf os.iso iso/boot/kernel.elf src/*.o
+	rm -rf *.o kernel.elf os.iso iso/boot/kernel.elf src/*.o src/drivers/*.o

@@ -8,7 +8,6 @@ int kmain() {
     // write_chars(test, 50);
     initGdt();
     idt_init();
-
     while (1) {
         __asm__ volatile ("hlt"); // Puts the CPU to sleep until the next interrupt
     }
