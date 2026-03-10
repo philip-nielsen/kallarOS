@@ -1,5 +1,5 @@
 #include "io.h"
-#include "stdint.h"
+#include <stdint.h>
 #include "pic.h"
 
 void pic_remap(int offset1, int offset2) {

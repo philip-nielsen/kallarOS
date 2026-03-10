@@ -1,4 +1,4 @@
-OBJECTS = loader.o kmain.o src/io.o src/gdt.o src/gdts.o src/idts.o src/idt.o src/pic.o src/drivers/keyboard.o
+OBJECTS = loader.o kmain.o src/io.o src/gdt.o src/gdt_asm.o src/idt_asm.o src/idt.o src/pic.o src/drivers/keyboard.o
 
 CC = i686-elf-gcc
 

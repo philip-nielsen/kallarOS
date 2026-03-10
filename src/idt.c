@@ -2,6 +2,7 @@
 #include "pic.h"
 #include "drivers/keyboard.h"
 #include "io.h"
+#include <stdbool.h>
 
 extern void irq_stub_1(void);
 
