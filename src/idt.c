@@ -2,6 +2,7 @@
 #include "pic.h"
 #include "drivers/keyboard.h"
 #include "io.h"
+#include "drivers/vga.h"
 #include <stdbool.h>
 
 extern void irq_stub_1(void);
@@ -14,7 +15,9 @@ __attribute__((aligned(0x10)))
 static idt_entry_t idt[256]; // Create an array of IDT entries; aligned for performance
 static idtr_t idtr;
 
-void exception_handler() {
+void exception_handler(uint32_t interrupt_num) {
+    print("KERNEL PANIC! CPU EXCEPTION: ");
+    print_int(interrupt_num);
     __asm__ volatile ("cli; hlt"); // Completely hangs the computer
     while (1); // To stop the compiler from complaining :)
 }

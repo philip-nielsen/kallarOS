@@ -30,7 +30,7 @@ os.iso: kernel.elf
 		iso
 
 run: os.iso
-	qemu-system-i386 -boot d -cdrom os.iso -m 512 -no-reboot -s
+	qemu-system-i386 -boot d -cdrom os.iso -m 512 -no-reboot -s -d int,cpu_reset -D qemu.log
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@

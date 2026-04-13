@@ -13,6 +13,9 @@
 
 void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg);
 void fb_move_cursor(unsigned short pos);
-void write_chars(char chars[], unsigned int pos);
+void write_chars(const char* chars, unsigned int pos);
+
+void print(const char* chars);
+void print_int(int n);
 
 #endif
