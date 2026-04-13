@@ -1,7 +1,9 @@
-OBJECTS = loader.o kmain.o src/io.o src/gdt.o src/gdt_asm.o src/idt_asm.o src/idt.o src/pic.o src/drivers/keyboard.o
+C_SOURCES = $(wildcard *.c src/*.c src/drivers/*.c)
+ASM_SOURCES = $(wildcard *.s src/*.s src/drivers/*.s)
+
+OBJECTS = $(C_SOURCES:.c=.o) $(ASM_SOURCES:.s=.o)
 
 CC = i686-elf-gcc
-
 CFLAGS = -ffreestanding -Wall -Wextra -Werror -c -g
 
 LDFLAGS = -T link.ld -nostdlib
@@ -17,15 +19,15 @@ kernel.elf: $(OBJECTS)
 os.iso: kernel.elf
 	cp kernel.elf iso/boot/kernel.elf
 	genisoimage -R                              \
-				-b boot/grub/stage2_eltorito    \
-				-no-emul-boot                   \
-				-boot-load-size 4               \
-				-A os                           \
-				-input-charset utf8             \
-				-quiet                          \
-				-boot-info-table                \
-				-o os.iso                       \
-				iso
+		-b boot/grub/stage2_eltorito    \
+		-no-emul-boot                   \
+		-boot-load-size 4               \
+		-A os                           \
+		-input-charset utf8             \
+		-quiet                          \
+		-boot-info-table                \
+		-o os.iso                       \
+		iso
 
 run: os.iso
 	qemu-system-i386 -boot d -cdrom os.iso -m 512 -no-reboot -s
@@ -37,4 +39,5 @@ run: os.iso
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o kernel.elf os.iso iso/boot/kernel.elf src/*.o src/drivers/*.o
+	find . -type f -name '*.o' -delete
+	rm -rf kernel.elf os.iso iso/boot/kernel.elf

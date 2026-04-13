@@ -1,4 +1,5 @@
 #include "keyboard.h"
+#include "vga.h"
 #include "../io.h"
 
 const char kbd_US[128] = {

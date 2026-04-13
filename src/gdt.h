@@ -1,3 +1,6 @@
+#ifndef INCLUDE_GDT_H
+#define INCLUDE_GDT_H
+
 #include <stdint.h>
 
 struct gdt_entry_struct {
@@ -17,3 +20,5 @@ struct gdt_ptr_struct {
 void initGdt();
 
 void setGdtGate(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran);
+
+#endif
