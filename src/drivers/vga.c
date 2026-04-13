@@ -1,5 +1,5 @@
 #include "vga.h"
-#include "../io.h" // Include our newly separated I/O ports!
+#include "../io.h"
 
 static char *fb = (char *) 0x000B8000;
 static unsigned int cursor_pos = 0;
@@ -31,6 +31,8 @@ void print(const char* chars) {
         if (chars[i] == '\n') {
             // Move cursor to the start of the next line.
             cursor_pos = (cursor_pos / 160 + 1) * 160;
+        } else if (chars[i] == '\r') {
+            cursor_pos = (cursor_pos / 160) * 160;
         } else {
             fb_write_cell(cursor_pos, chars[i], 0, 0x0F);
             cursor_pos += 2;

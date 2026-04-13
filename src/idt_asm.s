@@ -1,5 +1,6 @@
 %macro isr_err_stub 1
 isr_stub_%+%1:
+    push %1
     call exception_handler
     iret 
 %endmacro
@@ -9,7 +10,7 @@ isr_stub_%+%1:
     push 0      ; Push a dummy error code to keep stack aligned
     push %1     ; Push the interrupt number so C can read it!
     call exception_handler
-    ; (We don't need iret because the kernel is dead)
+    iret
 %endmacro
 
 extern exception_handler

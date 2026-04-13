@@ -17,7 +17,7 @@ typedef struct {
 } __attribute__((packed)) idtr_t;
 
 __attribute__((noreturn))
-void exception_handler(uint32_t interrupt_num);
+void exception_handler(uint32_t interrupt_num, uint32_t error_code);
 
 void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags);
 

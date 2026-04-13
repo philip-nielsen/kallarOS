@@ -12,7 +12,8 @@ Then you can run `make run` to build the kernel and run it in QEMU. You can also
 - [x] IDT & PIC (Hardware Interrupts)
 - [x] Keyboard Driver
 - [x] Automated Cross-Compiler Toolchain
-- [ ] The PIT (System timer & heartbeat)
+- [X] Basic Error Printing
+- [X] The APIC (System timer & heartbeat)
 - [ ] Memory Management (Physical RAM & Paging)
 - [ ] Kernel Heap (`malloc` & `free`)
 - [ ] Multitasking

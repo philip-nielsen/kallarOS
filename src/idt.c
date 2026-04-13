@@ -6,6 +6,8 @@
 #include <stdbool.h>
 
 extern void irq_stub_1(void);
+extern void isr_apic_timer(void);
+extern void isr_spurious(void);
 
 static bool vectors[256];
 
@@ -15,9 +17,12 @@ __attribute__((aligned(0x10)))
 static idt_entry_t idt[256]; // Create an array of IDT entries; aligned for performance
 static idtr_t idtr;
 
-void exception_handler(uint32_t interrupt_num) {
+void exception_handler(uint32_t interrupt_num, uint32_t error_code) {
     print("KERNEL PANIC! CPU EXCEPTION: ");
     print_int(interrupt_num);
+    print("\nERROR CODE: ");
+    print_int(error_code);
+
     __asm__ volatile ("cli; hlt"); // Completely hangs the computer
     while (1); // To stop the compiler from complaining :)
 }
@@ -43,7 +48,9 @@ void idt_init() {
 
     pic_remap(0x20, 0x28); // Start Master interrupts at IDT index 32 (0x20), and Slave interrupts at IDT index 40 (0x28)
 
-    idt_set_descriptor(33, irq_stub_1, 0x8E);
+    idt_set_descriptor(32, isr_apic_timer, 0x8E); // The Timer
+    idt_set_descriptor(39, isr_spurious, 0x8E);   // The Spurious Interrupt
+    idt_set_descriptor(33, irq_stub_1, 0x8E); // The keyboard
 
     __asm__ volatile ("lidt %0" : : "m"(idtr)); // Load the new IDT
 
