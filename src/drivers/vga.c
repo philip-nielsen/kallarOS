@@ -86,3 +86,12 @@ void print_int(int n) {
 
     print(buffer);
 }
+
+void clear_screen() {
+    for (int i = 0; i < 80 * 25; i++) {
+        fb_write_cell(i * 2, ' ', 0, 0x0F);
+    }
+    cursor_pos = 0;
+    
+    fb_move_cursor(0);
+}

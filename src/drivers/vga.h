@@ -17,5 +17,6 @@ void write_chars(const char* chars, unsigned int pos);
 
 void print(const char* chars);
 void print_int(int n);
+void clear_screen(void);
 
 #endif
