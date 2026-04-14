@@ -28,12 +28,10 @@ void apic_timer_handler() {
 }
 
 void apic_write(uint32_t reg, uint32_t value) {
-    // Volatile prevents the compiler from optimizing away the memory write
     *((volatile uint32_t*)(0xFEE00000 + reg)) = value;
 }
 
 uint32_t apic_read(uint32_t reg) {
-    // Volatile prevents the compiler from optimizing away the memory write
     return *((volatile uint32_t*)(0xFEE00000 + reg));
 }
 

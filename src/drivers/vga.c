@@ -6,7 +6,7 @@ static unsigned int cursor_pos = 0;
 
 void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg) {
     fb[i] = c;
-    fb[i + 1] = ((fg & 0x0F) << 4) | (bg & 0x0F);
+    fb[i + 1] = ((bg & 0x0F) << 4) | (fg & 0x0F);
 }
 
 void fb_move_cursor(unsigned short pos) {
@@ -34,7 +34,7 @@ void print(const char* chars) {
         } else if (chars[i] == '\r') {
             cursor_pos = (cursor_pos / 160) * 160;
         } else {
-            fb_write_cell(cursor_pos, chars[i], 0, 0x0F);
+            fb_write_cell(cursor_pos, chars[i], FB_WHITE, FB_BLACK);
             cursor_pos += 2;
         }
 
@@ -89,9 +89,32 @@ void print_int(int n) {
     print(buffer);
 }
 
+void print_color(const char* chars, vga_color_t color) {
+    int i = 0;
+    while (chars[i] != '\0') {
+        if (chars[i] == '\n') {
+            // Move cursor to the start of the next line.
+            cursor_pos = (cursor_pos / 160 + 1) * 160;
+        } else if (chars[i] == '\r') {
+            cursor_pos = (cursor_pos / 160) * 160;
+        } else {
+            fb_write_cell(cursor_pos, chars[i], color, FB_BLACK);
+            cursor_pos += 2;
+        }
+
+        i++;
+
+        if (cursor_pos >= 4000) { //Loop back until scrolling is implemted
+            cursor_pos = 0; 
+        }
+
+        fb_move_cursor(cursor_pos / 2);
+    }
+}
+
 void clear_screen() {
     for (int i = 0; i < 80 * 25; i++) {
-        fb_write_cell(i * 2, ' ', 0, 0x0F);
+        fb_write_cell(i * 2, ' ', FB_WHITE, FB_BLACK);
     }
     cursor_pos = 0;
     
