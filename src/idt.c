@@ -3,6 +3,7 @@
 #include "drivers/keyboard.h"
 #include "io.h"
 #include "drivers/vga.h"
+#include "kernel/panic.h"
 #include <stdbool.h>
 
 extern void irq_stub_1(void);
@@ -18,13 +19,9 @@ static idt_entry_t idt[256]; // Create an array of IDT entries; aligned for perf
 static idtr_t idtr;
 
 void exception_handler(uint32_t interrupt_num, uint32_t error_code) {
-    print("KERNEL PANIC! CPU EXCEPTION: ");
-    print_int(interrupt_num);
-    print("\nERROR CODE: ");
-    print_int(error_code);
+    kprintf("KERNEL PANIC! CPU EXCEPTION: %d\nERROR CODE: 0x%x\n", interrupt_num, error_code);
 
-    __asm__ volatile ("cli; hlt"); // Completely hangs the computer
-    while (1); // To stop the compiler from complaining :)
+    panic("Unhandled Hardware Exception!");
 }
 
 void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {

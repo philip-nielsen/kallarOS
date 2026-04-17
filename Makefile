@@ -1,5 +1,5 @@
-C_SOURCES = $(wildcard *.c src/*.c src/drivers/*.c)
-ASM_SOURCES = $(wildcard *.s src/*.s src/drivers/*.s)
+C_SOURCES = $(wildcard *.c src/*.c src/drivers/*.c src/kernel/*.c)
+ASM_SOURCES = $(wildcard *.s src/*.s src/drivers/*.s src/kernel/*.s)
 
 OBJECTS = $(C_SOURCES:.c=.o) $(ASM_SOURCES:.s=.o)
 

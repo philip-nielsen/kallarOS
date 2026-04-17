@@ -35,5 +35,8 @@ void print(const char* chars);
 void print_int(int n);
 void print_color(const char* chars, vga_color_t color);
 void clear_screen(void);
+void print_char(char c);
+void print_hex(unsigned int n);
+void kprintf(const char* format, ...);
 
 #endif

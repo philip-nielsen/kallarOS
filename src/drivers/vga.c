@@ -1,5 +1,6 @@
 #include "vga.h"
 #include "../io.h"
+#include <stdarg.h>
 
 static char *fb = (char *) 0x000B8000;
 static unsigned int cursor_pos = 0;
@@ -119,4 +120,87 @@ void clear_screen() {
     cursor_pos = 0;
     
     fb_move_cursor(0);
+}
+
+void print_char(char c) {
+    char str[2] = {c, '\0'};
+    print(str);
+}
+
+void print_hex(unsigned int n) {
+    if (n == 0) {
+        print("0x0");
+        return;
+    }
+
+    char buffer[11]; // "0x" + 8 hex digits + null terminator
+    buffer[0] = '0';
+    buffer[1] = 'x';
+    
+    int i = 9;
+    buffer[10] = '\0';
+
+    while (n > 0 && i >= 2) {
+        int remainder = n % 16;
+        if (remainder < 10) {
+            buffer[i] = remainder + '0';
+        } else {
+            buffer[i] = (remainder - 10) + 'A';
+        }
+        n /= 16;
+        i--;
+    }
+
+    print(&buffer[i + 1]);
+}
+
+void kprintf(const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+
+    for (int i = 0; format[i] != '\0'; i++) {
+        if (format[i] != '%') {
+            print_char(format[i]);
+            continue;
+        }
+
+        i++; 
+        
+        switch (format[i]) {
+            case 'd': { // Integer
+                int num = va_arg(args, int);
+                print_int(num);
+                break;
+            }
+            case 'x': { // Hexadecimal
+                unsigned int num = va_arg(args, unsigned int);
+                print_hex(num);
+                break;
+            }
+            case 's': { // String
+                char* str = va_arg(args, char*);
+                print(str);
+                break;
+            }
+            case 'c': { // Character
+                char c = (char)va_arg(args, int);
+                print_char(c);
+                break;
+            }
+            case '%': { // Escaped '%'
+                print_char('%');
+                break;
+            }
+            case '\0': { // String ended abruptly after a '%'
+                return; 
+            }
+            default: { // Unknown specifier (e.g., %z), print it as-is
+                print_char('%');
+                print_char(format[i]);
+                break;
+            }
+        }
+    }
+
+    va_end(args);
 }

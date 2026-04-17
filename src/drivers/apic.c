@@ -1,5 +1,4 @@
 #include "pit.h"
-#include "vga.h"
 #include <stdint.h>
 
 // Tthe memory address of the APIC's End Of Interrupt (EOI) register

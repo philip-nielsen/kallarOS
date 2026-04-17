@@ -1,5 +1,5 @@
 #include "timer.h"
-#include "drivers/apic.h"
+#include "../drivers/apic.h"
 
 void sleep_ms(uint32_t ms) {
     // 1 tick = 10ms
