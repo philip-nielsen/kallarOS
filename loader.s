@@ -24,6 +24,9 @@ loader:                         ; the loader label (defined as entry point in li
 start:
     CLI
     mov esp, kernel_stack + KERNEL_STACK_SIZE ; point esp to the start of the stack
+    ; Pass Multiboot info to kmain (kernel)
+    push eax    ; Push the magic number
+    push ebx    ; Push the pointer to the Multiboot Information Structure
     CALL kmain
     HLT
 
