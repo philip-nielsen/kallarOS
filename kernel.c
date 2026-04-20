@@ -4,11 +4,13 @@
 #include "src/io.h"
 #include "src/drivers/vga.h"
 #include "src/kernel/timer.h"
-#include "multiboot.h"
+#include "src/kernel/multiboot.h"
 #include "src/kernel/panic.h"
+#include "src/kernel/pmm.h"
+
 #include <stdint.h>
 
-
+static uint32_t bitmap[4096];
 int kmain(multiboot_info_t* mbd, uint32_t magic) {
     clear_screen();
 
@@ -22,51 +24,28 @@ int kmain(multiboot_info_t* mbd, uint32_t magic) {
         panic("invalid memory map given by GRUB bootloader");
     }
 
-    /* Loop through the memory map and display the values */
-    multiboot_memory_map_t* mmap = (multiboot_memory_map_t*) mbd->mmap_addr;
-    
-    while ((uint32_t)mmap < mbd->mmap_addr + mbd->mmap_length) {
-        
-        kprintf("Start Addr: %x | Length: %x | Type: %d\n",
-            (uint32_t)mmap->addr, (uint32_t)mmap->len, mmap->type);
+    kprintf("Init PMM\n");
+    pmm_init(mbd, (uint32_t)bitmap);
 
-        if(mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
-            // This is usable RAM!
-        }
-
-        // Safely advance to the next entry using the entry's actual size
-        mmap = (multiboot_memory_map_t*) ( (uint32_t)mmap + mmap->size + sizeof(mmap->size) );
-    }
-
-
-
-    print("Booting OS\n");
+    kprintf("Booting OS\n");
     initGdt();
-    print("GDT initialized\n");
+    kprintf("GDT initialized\n");
     idt_init();
-    print("IDT initialized\n");
+    kprintf("IDT initialized\n");
     outb(0x21, inb(0x21) | 0x01); // MASK LEGACY IRQ 0 (PIT)
 
     apic_start_timer();
-    print("APIC timer started\n");
+    kprintf("APIC timer started\n");
     
     uint32_t uptime_seconds = 0;
     char spinner[] = {'|', '/', '-', '\\'};
 
-    print("System Uptime: \n");
+    kprintf("System Uptime: \n");
 
     while (1) {
         // \r brings us back to the start of the line so we overwrite the old time
-        print("\r  [");
-        
-        // Pick a spinner frame based on the time
-        char current_spin[2] = { spinner[uptime_seconds % 4], '\0' };
-        print(current_spin);
-        
-        print("] ");
-        print_int(uptime_seconds);
-        print(" seconds active...");
-        
+        // Using %c for the spinner char and %d for the integer
+        kprintf("\r  [%c] %d seconds active...", spinner[uptime_seconds % 4], uptime_seconds);
         sleep_ms(1000); 
         uptime_seconds++;
     }

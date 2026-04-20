@@ -1,7 +1,9 @@
 C_SOURCES = $(wildcard *.c src/*.c src/drivers/*.c src/kernel/*.c)
 ASM_SOURCES = $(wildcard *.s src/*.s src/drivers/*.s src/kernel/*.s)
 
-OBJECTS = $(C_SOURCES:.c=.o) $(ASM_SOURCES:.s=.o)
+ALL_OBJECTS = $(C_SOURCES:.c=.o) $(ASM_SOURCES:.s=.o)
+
+OBJECTS = loader.o $(filter-out loader.o, $(ALL_OBJECTS))
 
 CC = i686-elf-gcc
 CFLAGS = -ffreestanding -Wall -Wextra -Werror -c -g

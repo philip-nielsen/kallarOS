@@ -26,6 +26,19 @@ void write_chars(const char* chars, unsigned int pos) {
     fb_move_cursor(pos / 2 + len);
 }
 
+static void scroll() {
+    for (int i = 0; i < 3840; i++) {
+        fb[i] = fb[i + 160];
+    }
+
+    for (int i = 3840; i < 4000; i += 2) {
+        fb[i] = ' ';
+        fb[i + 1] = 0x0F;
+    }
+
+    cursor_pos = 3840; 
+}
+
 void print(const char* chars) {
     int i = 0;
     while (chars[i] != '\0') {
@@ -41,8 +54,8 @@ void print(const char* chars) {
 
         i++;
 
-        if (cursor_pos >= 4000) { //Loop back until scrolling is implemted
-            cursor_pos = 0; 
+        if (cursor_pos >= 4000) {
+            scroll(); 
         }
 
         fb_move_cursor(cursor_pos / 2);
