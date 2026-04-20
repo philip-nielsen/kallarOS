@@ -6,6 +6,9 @@
 // 4KB blocks
 #define PAGE_SIZE 4096
 
+#define PAGE_ALIGN_DOWN(addr) ((addr) & ~0xFFF)
+#define PAGE_ALIGN_UP(addr) (((addr) + 0xFFF) & ~0xFFF)
+
 typedef struct {
     uint32_t* array;
     uint32_t max_blocks;
@@ -32,6 +35,7 @@ static inline int bitmap_check(uint32_t bit) {
 
 void pmm_mark_used(uint32_t physical_addr) {
     uint32_t frame_index = physical_addr / 4096;
+    if (frame_index >= pmm.max_blocks) return;
     
     if (!bitmap_check(frame_index)) { 
         bitmap_set(frame_index);
@@ -41,6 +45,7 @@ void pmm_mark_used(uint32_t physical_addr) {
 
 void pmm_mark_free(uint32_t physical_addr) {
     uint32_t frame_index = physical_addr / 4096;
+    if (frame_index >= pmm.max_blocks) return;
     
     if (bitmap_check(frame_index)) { 
         bitmap_clear(frame_index);
@@ -66,23 +71,33 @@ void pmm_init(multiboot_info_t* mbd, uint32_t bitmap_addr) {
     while ((uint32_t)mmap < mbd->mmap_addr + mbd->mmap_length) {
 
         if(mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
+            uint32_t region_start = PAGE_ALIGN_UP(mmap->addr);
+            uint32_t region_end = PAGE_ALIGN_DOWN(mmap->addr + mmap->len);
 
-            for (uint32_t i = mmap->addr; i <  mmap->len; i += 4096) {
-                pmm_mark_free(i);
+            for (uint32_t i = region_start; i <  region_end; i += 4096) {
+                uint32_t frame_index = i / 4096;
+                if (bitmap_check(frame_index)) { 
+                    bitmap_clear(frame_index);
+                    pmm.used_blocks--;
+                };
             }
 
         }
         mmap = (multiboot_memory_map_t*) ( (uint32_t)mmap + mmap->size + sizeof(mmap->size) );
     }
 
-    uint32_t start_addr = (uint32_t)&kernel_start;  
-    uint32_t end_addr = (uint32_t)&kernel_end;
+    uint32_t start_addr = PAGE_ALIGN_DOWN((uint32_t)&kernel_start);  
+    uint32_t end_addr = PAGE_ALIGN_UP((uint32_t)&kernel_end);
 
+    // Protect kernel
+    for (uint32_t i = start_addr; i < end_addr; i += 4096) {
+        pmm_mark_used(i);
+    }
+
+    // Protect bitmap
     uint32_t bitmap_size_bytes = pmm.max_blocks / 8;
-    uint32_t protect_end = end_addr + bitmap_size_bytes;
-
-    //Set Kernel code as used
-    for (uint32_t i = start_addr; i < protect_end; i += 4096) {
+    uint32_t bitmap_end = bitmap_addr + bitmap_size_bytes;
+    for (uint32_t i = bitmap_addr; i < bitmap_end; i += 4096) {
         pmm_mark_used(i);
     }
     
@@ -95,7 +110,7 @@ void pmm_init(multiboot_info_t* mbd, uint32_t bitmap_addr) {
 uint32_t pmm_alloc_frame() {
     for (uint32_t i = pmm.last_allocated_bit; i < pmm.max_blocks; i++) {
         if (!bitmap_check(i)) {
-            bitmap_set(i);
+            pmm_mark_used(i * 4096);
             pmm.last_allocated_bit = i;
             return (uint32_t) i * 4096;
         }
@@ -103,7 +118,7 @@ uint32_t pmm_alloc_frame() {
 
     for (uint32_t i = 0; i < pmm.last_allocated_bit; i++) {
         if (!bitmap_check(i)) {
-            bitmap_set(i);
+            pmm_mark_used(i * 4096);
             pmm.last_allocated_bit = i;
             return (uint32_t) i * 4096;
         }

@@ -10,7 +10,8 @@
 
 #include <stdint.h>
 
-static uint32_t bitmap[4096];
+extern uint32_t kernel_end;
+
 int kmain(multiboot_info_t* mbd, uint32_t magic) {
     clear_screen();
 
@@ -24,8 +25,10 @@ int kmain(multiboot_info_t* mbd, uint32_t magic) {
         panic("invalid memory map given by GRUB bootloader");
     }
 
+    uint32_t bitmap_addr = (((uint32_t)&kernel_end) + 0xFFF) & ~0xFFF;
+
     kprintf("Init PMM\n");
-    pmm_init(mbd, (uint32_t)bitmap);
+    pmm_init(mbd, bitmap_addr);
 
     kprintf("Booting OS\n");
     initGdt();
@@ -43,8 +46,6 @@ int kmain(multiboot_info_t* mbd, uint32_t magic) {
     kprintf("System Uptime: \n");
 
     while (1) {
-        // \r brings us back to the start of the line so we overwrite the old time
-        // Using %c for the spinner char and %d for the integer
         kprintf("\r  [%c] %d seconds active...", spinner[uptime_seconds % 4], uptime_seconds);
         sleep_ms(1000); 
         uptime_seconds++;
