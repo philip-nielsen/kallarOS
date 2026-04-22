@@ -1,7 +1,6 @@
-#include "pmm.h"
-#include "multiboot.h"
-#include "panic.h"
-#include "../drivers/vga.h"
+#include <kernel/pmm.h>
+#include <kernel/panic.h>
+#include <drivers/vga.h>
 
 // 4KB blocks
 #define PAGE_SIZE 4096

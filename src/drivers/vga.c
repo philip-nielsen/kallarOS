@@ -1,5 +1,5 @@
-#include "vga.h"
-#include "../io.h"
+#include <drivers/vga.h>
+#include <arch/i386/io.h>
 #include <stdarg.h>
 
 static char *fb = (char *) 0x000B8000;

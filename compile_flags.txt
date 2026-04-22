@@ -1,0 +1,6 @@
+-Iinclude
+-ffreestanding
+-m32
+-nostdlib
+-Wall
+-Wextra

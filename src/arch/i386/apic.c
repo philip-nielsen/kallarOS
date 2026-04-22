@@ -1,4 +1,5 @@
-#include "pit.h"
+#include <arch/i386/pit.h>
+#include <arch/i386/apic.h>
 #include <stdint.h>
 
 // Tthe memory address of the APIC's End Of Interrupt (EOI) register

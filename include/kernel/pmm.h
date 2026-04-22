@@ -2,7 +2,7 @@
 #define PMM_H
 
 #include <stdint.h>
-#include "multiboot.h"
+#include <arch/i386/multiboot.h>
 
 void pmm_init(multiboot_info_t* mbd, uint32_t bitmap_addr);
 void pmm_mark_used(uint32_t physical_addr);

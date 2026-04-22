@@ -1,12 +1,12 @@
-#include "src/gdt.h"
-#include "src/idt.h"
-#include "src/drivers/apic.h"
-#include "src/io.h"
-#include "src/drivers/vga.h"
-#include "src/kernel/timer.h"
-#include "src/kernel/multiboot.h"
-#include "src/kernel/panic.h"
-#include "src/kernel/pmm.h"
+#include <arch/i386/gdt.h>
+#include <arch/i386/idt.h>
+#include <arch/i386/apic.h>
+#include <arch/i386/io.h>
+#include <arch/i386/multiboot.h>
+#include <drivers/vga.h>
+#include <kernel/timer.h>
+#include <kernel/panic.h>
+#include <kernel/pmm.h>
 
 #include <stdint.h>
 

@@ -1,9 +1,9 @@
-#include "idt.h"
-#include "pic.h"
-#include "drivers/keyboard.h"
-#include "io.h"
-#include "drivers/vga.h"
-#include "kernel/panic.h"
+#include <arch/i386/idt.h>
+#include <arch/i386/pic.h>
+#include <drivers/keyboard.h>
+#include <arch/i386/io.h>
+#include <drivers/vga.h>
+#include <kernel/panic.h>
 #include <stdbool.h>
 
 extern void irq_stub_1(void);

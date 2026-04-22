@@ -1,4 +1,4 @@
-#include "io.h"
+#include <arch/i386/io.h>
 
 void outb(uint16_t port, uint8_t data) {
     __asm__ volatile (

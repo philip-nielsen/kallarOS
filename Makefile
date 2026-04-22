@@ -1,12 +1,13 @@
-C_SOURCES = $(wildcard *.c src/*.c src/drivers/*.c src/kernel/*.c)
-ASM_SOURCES = $(wildcard *.s src/*.s src/drivers/*.s src/kernel/*.s)
+C_SOURCES = $(shell find src -type f -name '*.c')
+ASM_SOURCES = $(shell find src -type f -name '*.s')
 
 ALL_OBJECTS = $(C_SOURCES:.c=.o) $(ASM_SOURCES:.s=.o)
 
-OBJECTS = loader.o $(filter-out loader.o, $(ALL_OBJECTS))
+OBJECTS = src/boot/loader.o $(filter-out src/boot/loader.o, $(ALL_OBJECTS))
 
 CC = i686-elf-gcc
-CFLAGS = -ffreestanding -Wall -Wextra -Werror -c -g
+
+CFLAGS = -ffreestanding -Wall -Wextra -Werror -I include -c -g
 
 LDFLAGS = -T link.ld -nostdlib
 
@@ -41,5 +42,5 @@ run: os.iso
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	find . -type f -name '*.o' -delete
-	rm -rf kernel.elf os.iso iso/boot/kernel.elf
+	find src -type f -name '*.o' -delete
+	rm -rf kernel.elf os.iso iso/boot/kernel.elf qemu.log

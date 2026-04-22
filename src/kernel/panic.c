@@ -1,6 +1,5 @@
-#include "panic.h"
-
-#include "../drivers/vga.h" 
+#include <kernel/panic.h>
+#include <drivers/vga.h>
 
 void panic(const char* message) {
     print_color("\n========================================\n", FB_RED);

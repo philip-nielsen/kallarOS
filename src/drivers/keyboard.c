@@ -1,6 +1,6 @@
-#include "keyboard.h"
-#include "vga.h"
-#include "../io.h"
+#include <drivers/keyboard.h>
+#include <drivers/vga.h>
+#include <arch/i386/io.h>
 
 const char kbd_US[128] = {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',

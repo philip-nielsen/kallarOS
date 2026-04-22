@@ -1,4 +1,4 @@
-#include "gdt.h"
+#include <arch/i386/gdt.h>
 
 extern void gdt_flush(struct gdt_ptr_struct* addr_t);
 
