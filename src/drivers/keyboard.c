@@ -1,5 +1,5 @@
 #include <drivers/keyboard.h>
-#include <drivers/vga.h>
+#include <libc/stdio.h>
 #include <arch/i386/io.h>
 
 const char kbd_US[128] = {
@@ -19,7 +19,7 @@ void keyboard_handler() {
 
         if (c != 0) {
             char str[2] = {c, '\0'}; 
-            print(str);
+            printf(str);
         }
     }
 }

@@ -1,5 +1,4 @@
 #include <arch/i386/io.h>
-#include <stdint.h>
 
 #define PIT_CMD_PORT 0x43
 #define PIT_CH2_PORT 0x42

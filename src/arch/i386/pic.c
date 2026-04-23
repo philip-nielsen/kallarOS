@@ -1,6 +1,5 @@
 #include <arch/i386/io.h>
 #include <arch/i386/pic.h>
-#include <stdint.h>
 
 void pic_remap(int offset1, int offset2) {
     uint8_t a1, a2;

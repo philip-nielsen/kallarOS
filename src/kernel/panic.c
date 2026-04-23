@@ -1,14 +1,15 @@
 #include <kernel/panic.h>
+#include <libc/stdio.h>
 #include <drivers/vga.h>
-
 void panic(const char* message) {
-    print_color("\n========================================\n", FB_RED);
-    print_color("              KERNEL PANIC              \n", FB_RED);
-    print_color("========================================\n", FB_RED);
+    vga_set_color(FB_RED, FB_BLACK);
+    printf("\n========================================\n");
+    printf("              KERNEL PANIC              \n");
+    printf("========================================\n");
     
-    print_color("FATAL ERROR: ", FB_RED);
-    print_color(message, FB_RED);
-    print_color("\n\nSystem halted. Please restart.", FB_RED);
+    printf("FATAL ERROR: ");
+    printf(message);
+    printf("\n\nSystem halted. Please restart.");
 
     while (1) {
         __asm__ volatile ("cli; hlt");

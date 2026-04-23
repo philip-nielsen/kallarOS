@@ -1,6 +1,7 @@
 #include <kernel/pmm.h>
 #include <kernel/panic.h>
-#include <drivers/vga.h>
+#include <libc/stdio.h>
+#include <libc/string.h>
 
 // 4KB blocks
 #define PAGE_SIZE 4096
@@ -50,8 +51,17 @@ void pmm_mark_free(uint32_t physical_addr) {
         bitmap_clear(frame_index);
         pmm.used_blocks--;
     } else {
-        kprintf("WARNING: Double free detected at physical address 0x%x\n", physical_addr);
+        printf("WARNING: Double free detected at physical address 0x%x\n", physical_addr);
         panic("Double free");
+    }
+}
+
+static void pmm_mark_region_used(uint32_t start_addr, uint32_t end_addr) {
+    uint32_t start_frame = PAGE_ALIGN_DOWN(start_addr) / PAGE_SIZE;
+    uint32_t end_frame = PAGE_ALIGN_UP(end_addr) / PAGE_SIZE;
+
+    for (uint32_t i = start_frame; i < end_frame; i++) {
+        pmm_mark_used(i * PAGE_SIZE);
     }
 }
 
@@ -84,10 +94,8 @@ void pmm_init(multiboot_info_t* mbd, uint32_t bitmap_addr) {
     pmm.last_allocated_bit = 0; 
 
     //Mark everything as used by default
-    uint32_t array_size = ((pmm.max_blocks + 31) / 32);
-    for (uint32_t i = 0; i < array_size; i++) {
-        pmm.array[i] = 0xFFFFFFFF; // Sets 32 bits to 1
-    }
+    uint32_t bitmap_size_bytes = ((pmm.max_blocks + 31) / 32) * 4;
+    memset(pmm.array, 0xFF, bitmap_size_bytes);
 
     mmap = (multiboot_memory_map_t*) mbd->mmap_addr; 
 
@@ -115,29 +123,14 @@ void pmm_init(multiboot_info_t* mbd, uint32_t bitmap_addr) {
         mmap = (multiboot_memory_map_t*) ( (uint32_t)mmap + mmap->size + sizeof(mmap->size) );
     }
 
-    uint32_t k_start_addr = PAGE_ALIGN_DOWN((uint32_t)&kernel_start);  
-    uint32_t k_end_addr = PAGE_ALIGN_UP((uint32_t)&kernel_end);
+    // Protect kernel
+    pmm_mark_region_used((uint32_t)&kernel_start, (uint32_t)&kernel_end);
 
-    //Protect kernel
-    for (uint32_t i = k_start_addr; i < k_end_addr; i += 4096) {
-        pmm_mark_used(i);
-    }
-
-    //Protect bitmap
-    uint32_t bitmap_size_bytes = ((pmm.max_blocks + 31) / 32) * 4;
-    uint32_t bitmap_end = bitmap_addr + bitmap_size_bytes;
+    // Protect bitmap
+    pmm_mark_region_used(bitmap_addr, bitmap_addr + bitmap_size_bytes);
     
-    uint32_t bitmap_start_frame = PAGE_ALIGN_DOWN(bitmap_addr) / PAGE_SIZE;
-    uint32_t bitmap_end_frame = PAGE_ALIGN_UP(bitmap_end) / PAGE_SIZE;
-
-    for (uint32_t i = bitmap_start_frame; i < bitmap_end_frame; i++) {
-        pmm_mark_used(i * PAGE_SIZE);
-}
-    
-    //Set first 1MB as used
-    for (uint32_t i = 0; i < 0x100000; i += 4096) {
-        pmm_mark_used(i);
-    }
+    // Protect first 1MB (BIOS, VGA buffer, etc.)
+    pmm_mark_region_used(0, 0x100000);
 }
 
 uint32_t pmm_alloc_frame() {

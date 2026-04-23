@@ -2,7 +2,7 @@
 #include <arch/i386/pic.h>
 #include <drivers/keyboard.h>
 #include <arch/i386/io.h>
-#include <drivers/vga.h>
+#include <libc/stdio.h>
 #include <kernel/panic.h>
 #include <stdbool.h>
 
@@ -19,7 +19,7 @@ static idt_entry_t idt[256]; // Create an array of IDT entries; aligned for perf
 static idtr_t idtr;
 
 void exception_handler(uint32_t interrupt_num, uint32_t error_code) {
-    kprintf("KERNEL PANIC! CPU EXCEPTION: %d\nERROR CODE: 0x%x\n", interrupt_num, error_code);
+    printf("KERNEL PANIC! CPU EXCEPTION: %d\nERROR CODE: 0x%x\n", interrupt_num, error_code);
 
     panic("Unhandled Hardware Exception!");
 }
