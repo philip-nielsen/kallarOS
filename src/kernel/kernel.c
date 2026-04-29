@@ -3,6 +3,7 @@
 #include <arch/i386/apic.h>
 #include <arch/i386/io.h>
 #include <arch/i386/multiboot.h>
+#include <arch/i386/paging.h>
 #include <libc/stdio.h>
 #include <drivers/vga.h>
 #include <kernel/timer.h>
@@ -31,12 +32,17 @@ int kmain(multiboot_info_t* mbd, uint32_t magic) {
     printf("Init PMM\n");
     pmm_init(mbd, bitmap_addr);
 
+    printf("Init Paging\n");
+    paging_init();
+
     printf("Booting OS\n");
     initGdt();
     printf("GDT initialized\n");
     idt_init();
     printf("IDT initialized\n");
+    
     outb(0x21, inb(0x21) | 0x01); // MASK LEGACY IRQ 0 (PIT)
+    map_page(0xFEE00000, 0xFEE00000, PTE_PRESENT | PTE_RW); // Identity map the APIC time
 
     apic_start_timer();
     printf("APIC timer started\n");

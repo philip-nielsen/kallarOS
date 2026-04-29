@@ -5,6 +5,7 @@
 #include <libc/stdio.h>
 #include <kernel/panic.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 extern void irq_stub_1(void);
 extern void isr_apic_timer(void);
@@ -19,7 +20,33 @@ static idt_entry_t idt[256]; // Create an array of IDT entries; aligned for perf
 static idtr_t idtr;
 
 void exception_handler(uint32_t interrupt_num, uint32_t error_code) {
-    printf("KERNEL PANIC! CPU EXCEPTION: %d\nERROR CODE: 0x%x\n", interrupt_num, error_code);
+    if (interrupt_num == 14) {
+        uint32_t faulting_address;
+        __asm__ volatile("mov %%cr2, %0" : "=r" (faulting_address));
+
+        printf("Page Fault at Virtual Address: 0x%x\n", faulting_address);
+
+        if ((error_code & 0x1) == 0) {
+            printf("Page not present\n");
+        } else {
+            printf("Page protection violation\n");
+        }
+
+        if ((error_code & 0x2) == 2) {
+            printf("Action: Write\n");
+        } else {
+            printf("Action: Read\n");
+        }
+
+        if ((error_code & 0x4) == 4) {
+            printf("User Mode\n");
+        } else {
+            printf("Kernel Mode\n");
+        }
+
+    } else {
+        printf("KERNEL PANIC! CPU EXCEPTION: %d\nERROR CODE: 0x%x\n", interrupt_num, error_code);
+    }
 
     panic("Unhandled Hardware Exception!");
 }
