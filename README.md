@@ -1,9 +1,22 @@
-Just a fun hobby project to try to create my own little OS.
-Currently, IDT, GDT, PIC, and a simple VGA text mode driver are implemented. Interrupts from the keyboard are also implemented.
+# KallarOS
 
-Simply run `build_toolchain.sh` to build the whole toolchain, including the cross-compiler.
+A hobby x86 32-bit operating system built from scatch in C and assembly. The goal of this project is to learn about operating system development, low-level programming and to have fun :)!
 
-Then you can run `make run` to build the kernel and run it in QEMU. You can also run `make clean` to clean the build artifacts.
+Currently, the kernel successfully boots into a fully paged virtual memory environment, complete with physical/virtual memory allocators, hardware interrupts (IDT/PIC), an APIC system timer, and a basic VGA text-mode driver.
+
+![Screenshot of OS booting in QEMU](kallaros.png)
+
+## Getting Started
+
+### Prerequisites
+If you're on a debian-based system, simply run `build_toolchain.sh` to build the whole toolchain, including the cross-compiler.
+
+### Building and Running
+Once the toolchain is built, use the Makefile to compile the kernel and launch it in QEMU:
+- `make` - Builds the kernel and creates a bootable ISO image.
+- `make run` - Builds the kernel and runs it in QEMU.
+- `make clean` - Cleans up build artifacts.
+- `make debug` - Boots the OS paused, waiting for a GDB connection on port 1234
 
 ### Roadmap
 - [x] Bootloader
@@ -12,9 +25,9 @@ Then you can run `make run` to build the kernel and run it in QEMU. You can also
 - [x] IDT & PIC (Hardware Interrupts)
 - [x] Keyboard Driver
 - [x] Automated Cross-Compiler Toolchain
-- [X] Basic Error Printing
-- [X] The APIC (System timer & heartbeat)
-- [ ] Memory Management (Physical RAM & Paging)
+- [x] Basic Error Printing
+- [x] The APIC (System timer & heartbeat)
+- [x] Memory Management (Physical RAM & Paging)
 - [ ] Kernel Heap (`malloc` & `free`)
 - [ ] Multitasking
 - [ ] User Space (Ring 3) & System Calls

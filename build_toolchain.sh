@@ -5,6 +5,12 @@ set -e
 
 echo "Starting KallarOS Environment Setup..."
 
+if ! command -v apt-get &> /dev/null; then
+    echo "Error: 'apt-get' not found."
+    echo "This script strictly requires a Debian/Ubuntu-based Linux distribution."
+    exit 1
+fi
+
 echo "Installing dependencies(sudo required)..."
 sudo apt-get update
 sudo apt-get install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo curl \
