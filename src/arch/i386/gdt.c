@@ -1,4 +1,5 @@
 #include <arch/i386/gdt.h>
+#include <stdint.h>
 
 extern void gdt_flush(struct gdt_ptr_struct* addr_t);
 
@@ -7,13 +8,13 @@ struct gdt_ptr_struct gdt_ptr;
 
 void initGdt() {
     gdt_ptr.limit = (sizeof(struct gdt_entry_struct) * 5) - 1;
-    gdt_ptr.base = (unsigned int) &gdt_entries;
+    gdt_ptr.base = (uint32_t) &gdt_entries;
 
-    setGdtGate(0,0,0,0,0); //Null segment
-    setGdtGate(1,0,0xFFFFFFF, 0x9A, 0xCF); //Kernel code segment
-    setGdtGate(2,0,0xFFFFFFF, 0x92, 0xCF); //Kernel data segment
-    setGdtGate(3,0,0xFFFFFFF, 0xFA, 0xCF); //User code segment
-    setGdtGate(4,0,0xFFFFFFF, 0xF2, 0xCF); //User data segment
+    setGdtGate(0,0,0,0,0); // Null segment
+    setGdtGate(1,0,0xFFFFFFF, 0x9A, 0xCF); // Kernel code segment
+    setGdtGate(2,0,0xFFFFFFF, 0x92, 0xCF); // Kernel data segment
+    setGdtGate(3,0,0xFFFFFFF, 0xFA, 0xCF); // User code segment
+    setGdtGate(4,0,0xFFFFFFF, 0xF2, 0xCF); // User data segment
 
     gdt_flush(&gdt_ptr);
 }

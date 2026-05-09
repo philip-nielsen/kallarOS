@@ -67,9 +67,9 @@ static void pmm_mark_region_used(uint32_t start_addr, uint32_t end_addr) {
 
 void pmm_init(multiboot_info_t* mbd, uint32_t bitmap_addr) {
     uint32_t highest_addr = 0;
-    multiboot_memory_map_t* mmap = (multiboot_memory_map_t*) mbd->mmap_addr;
+    multiboot_memory_map_t* mmap = (multiboot_memory_map_t*) (mbd->mmap_addr + 0xC0000000);
 
-    while ((uint32_t)mmap < mbd->mmap_addr + mbd->mmap_length) {
+    while ((uint32_t)mmap < mbd->mmap_addr + mbd->mmap_length + 0xC0000000) {
         if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
             if (mmap->addr <= 0xFFFFFFFF) {
                 uint32_t region_end;
@@ -97,9 +97,9 @@ void pmm_init(multiboot_info_t* mbd, uint32_t bitmap_addr) {
     uint32_t bitmap_size_bytes = ((pmm.max_blocks + 31) / 32) * 4;
     memset(pmm.array, 0xFF, bitmap_size_bytes);
 
-    mmap = (multiboot_memory_map_t*) mbd->mmap_addr; 
+    mmap = (multiboot_memory_map_t*) (mbd->mmap_addr + 0xC0000000); 
 
-    while ((uint32_t)mmap < mbd->mmap_addr + mbd->mmap_length) {
+    while ((uint32_t)mmap < mbd->mmap_addr + mbd->mmap_length + 0xC0000000) {
         if (mmap->addr <= 0xFFFFFFFF && mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
             uint32_t region_start = PAGE_ALIGN_UP(mmap->addr);
             uint32_t region_end;
@@ -124,7 +124,7 @@ void pmm_init(multiboot_info_t* mbd, uint32_t bitmap_addr) {
     }
 
     // Protect kernel
-    pmm_mark_region_used((uint32_t)&kernel_start, (uint32_t)&kernel_end);
+    pmm_mark_region_used((uint32_t)&kernel_start - 0xC0000000, (uint32_t)&kernel_end - 0xC0000000);
 
     // Protect bitmap
     pmm_mark_region_used(bitmap_addr, bitmap_addr + bitmap_size_bytes);

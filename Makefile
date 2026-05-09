@@ -7,7 +7,7 @@ OBJECTS = src/boot/loader.o $(filter-out src/boot/loader.o, $(ALL_OBJECTS))
 
 CC = i686-elf-gcc
 
-CFLAGS = -ffreestanding -Wall -Wextra -Werror -I include -c -g
+CFLAGS = -ffreestanding -Wall -Wextra -Werror -I include -c -g -os
 
 LDFLAGS = -T link.ld -nostdlib
 
@@ -33,10 +33,10 @@ os.iso: kernel.elf
 		iso
 
 run: os.iso
-	qemu-system-i386 -boot d -cdrom os.iso -m 512 -no-reboot -s -d int,cpu_reset -D qemu.log
+	qemu-system-i386 -boot d -cdrom os.iso -m 4096 -no-reboot -s -d int,cpu_reset -D qemu.log
 
 debug: os.iso
-	qemu-system-i386 -boot d -cdrom os.iso -m 512 -no-reboot -s -S -d int,cpu_reset -D qemu.log
+	qemu-system-i386 -boot d -cdrom os.iso -m 4096 -no-reboot -s -S -d int,cpu_reset -D qemu.log
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@

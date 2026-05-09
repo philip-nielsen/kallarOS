@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define PAGE_SIZE 4096
+
 typedef uint32_t page_table_entry_t;
 typedef uint32_t page_directory_entry_t;
 

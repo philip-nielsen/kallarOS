@@ -15,7 +15,14 @@
 extern uint32_t kernel_end;
 
 int kmain(multiboot_info_t* mbd, uint32_t magic) {
-    vga_clear_screen();
+    vga_clear_screen(); 
+    printf("Booting OS\n");
+    initGdt();
+    printf("GDT initialized\n");
+    idt_init();
+    printf("IDT initialized\n");
+
+    mbd = (multiboot_info_t*) ((uint32_t)mbd + 0xC0000000);
 
     /* Make sure the magic number matches for memory mapping*/
     if(magic != MULTIBOOT_BOOTLOADER_MAGIC) {
@@ -34,12 +41,6 @@ int kmain(multiboot_info_t* mbd, uint32_t magic) {
 
     printf("Init Paging\n");
     paging_init();
-
-    printf("Booting OS\n");
-    initGdt();
-    printf("GDT initialized\n");
-    idt_init();
-    printf("IDT initialized\n");
     
     outb(0x21, inb(0x21) | 0x01); // MASK LEGACY IRQ 0 (PIT)
     map_page(0xFEE00000, 0xFEE00000, PTE_PRESENT | PTE_RW); // Identity map the APIC time
