@@ -1,16 +1,19 @@
 #include <arch/i386/paging.h>
 #include <kernel/kmalloc.h>
+#include <kernel/panic.h>
+#include <libc/stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef struct block_header {
+typedef struct current {
     uint32_t size_and_flags; // 31 bits for size, the lsb for used
-    struct block_header *next_free_slot;
+    struct current *next_free_slot;
 } block_header_t;
 
 static block_header_t *free_list_head = 0;
 
-static uint32_t heap_watermark = 0;
+extern uint32_t kernel_end;
+static uint32_t heap_watermark = (uint32_t)&kernel_end + 0x50000;
 
 uint32_t malloc(size_t bytes_to_allocate) {
     if (bytes_to_allocate <= 0) {
@@ -85,8 +88,48 @@ uint32_t malloc(size_t bytes_to_allocate) {
     return malloc(bytes_to_allocate);
 }
 
-void kmalloc_init() {
-    extern uint32_t kernel_end;
+void kfree(uint32_t address) {
+    block_header_t *current =
+        (block_header_t *)(address - sizeof(block_header_t));
 
-    heap_watermark = (uint32_t)&kernel_end + 0x50000;
+    if (current->size_and_flags & 0x1) {
+        printf("Use after free for %d\n", address);
+        panic("USE AFTER FREE!");
+    }
+
+    current->size_and_flags |= 0x1;
+
+    block_header_t *head = free_list_head;
+    block_header_t *prev = 0;
+
+    while (head != 0 && (uint32_t)head < (uint32_t)current) {
+        prev = head;
+        head = head->next_free_slot;
+    }
+
+    current->next_free_slot = head;
+    if (prev == 0) {
+        free_list_head = current;
+    } else {
+        prev->next_free_slot = current;
+    }
+
+    uint32_t current_size = current->size_and_flags & ~0x1;
+
+    if (head != 0) {
+        if ((uint32_t)current + current_size ==
+            (uint32_t)head->next_free_slot) {
+            current->size_and_flags +=
+                (head->next_free_slot->size_and_flags & ~0x1);
+            current->next_free_slot = head->next_free_slot->next_free_slot;
+        }
+    }
+
+    if (prev != 0) {
+        uint32_t prev_size = prev->size_and_flags & ~0x1;
+        if ((uint32_t)prev + prev_size == (uint32_t)current) {
+            prev->size_and_flags += (current_size);
+            prev->next_free_slot = current->next_free_slot;
+        }
+    }
 }
