@@ -1,11 +1,11 @@
-#include <libc/stdio.h>
 #include <drivers/vga.h>
+#include <libc/stdio.h>
 #include <stdarg.h>
 
-static int print_string(const char* chars) {
+static int print_string(const char *chars) {
     int i = 0;
     while (chars[i] != '\0') {
-        if( putchar(chars[i]) == EOF) { 
+        if (putchar(chars[i]) == EOF) {
             return EOF;
         }
         i++;
@@ -22,7 +22,7 @@ static void print_hex(unsigned int n) {
     char buffer[11]; // "0x" + 8 hex digits + null terminator
     buffer[0] = '0';
     buffer[1] = 'x';
-    
+
     int i = 9;
     buffer[10] = '\0';
 
@@ -46,7 +46,7 @@ static void print_int(int n) {
         return;
     }
 
-    char buffer[12]; //Max length of a 32-bit int + sign + null terminator
+    char buffer[12]; // Max length of a 32-bit int + sign + null terminator
     int i = 0;
     int is_negative = 0;
 
@@ -75,7 +75,7 @@ static void print_int(int n) {
         buffer[start] = buffer[end];
         buffer[end] = temp;
         start++;
-        end--; 
+        end--;
     }
 
     print_string(buffer);
@@ -86,13 +86,13 @@ int putchar(int ic) {
     return ic;
 }
 
-int puts(const char* chars) {
+int puts(const char *chars) {
     int count = print_string(chars);
     putchar('\n');
-    return count + 1; 
+    return count + 1;
 }
 
-int printf(const char* format, ...) {
+int printf(const char *format, ...) {
     va_list args;
     va_start(args, format);
 
@@ -102,41 +102,41 @@ int printf(const char* format, ...) {
             continue;
         }
 
-        i++; 
-        
+        i++;
+
         switch (format[i]) {
-            case 'd': { // Integer
-                int num = va_arg(args, int);
-                print_int(num);
-                break;
-            }
-            case 'x': { // Hexadecimal
-                unsigned int num = va_arg(args, unsigned int);
-                print_hex(num);
-                break;
-            }
-            case 's': { // String
-                char* str = va_arg(args, char*);
-                print_string(str);
-                break;
-            }
-            case 'c': { // Character
-                char c = (char)va_arg(args, int);
-                putchar(c);
-                break;
-            }
-            case '%': { // Escaped '%'
-                putchar('%');
-                break;
-            }
-            case '\0': { // String ended abruptly after a '%'
-                return 0; 
-            }
-            default: { // Unknown specifier (e.g., %z), puts it as-is
-                putchar('%');
-                putchar(format[i]);
-                break;
-            }
+        case 'd': { // Integer
+            int num = va_arg(args, int);
+            print_int(num);
+            break;
+        }
+        case 'x': { // Hexadecimal
+            unsigned int num = va_arg(args, unsigned int);
+            print_hex(num);
+            break;
+        }
+        case 's': { // String
+            char *str = va_arg(args, char *);
+            print_string(str);
+            break;
+        }
+        case 'c': { // Character
+            char c = (char)va_arg(args, int);
+            putchar(c);
+            break;
+        }
+        case '%': { // Escaped '%'
+            putchar('%');
+            break;
+        }
+        case '\0': { // String ended abruptly after a '%'
+            return 0;
+        }
+        default: { // Unknown specifier (e.g., %z), puts it as-is
+            putchar('%');
+            putchar(format[i]);
+            break;
+        }
         }
     }
 

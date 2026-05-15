@@ -1,9 +1,9 @@
 #include <arch/i386/idt.h>
+#include <arch/i386/io.h>
 #include <arch/i386/pic.h>
 #include <drivers/keyboard.h>
-#include <arch/i386/io.h>
-#include <libc/stdio.h>
 #include <kernel/panic.h>
+#include <libc/stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -13,16 +13,16 @@ extern void isr_spurious(void);
 
 static bool vectors[256];
 
-extern void* isr_stub_table[];
+extern void *isr_stub_table[];
 
-__attribute__((aligned(0x10))) 
-static idt_entry_t idt[256]; // Create an array of IDT entries; aligned for performance
+__attribute__((aligned(0x10))) static idt_entry_t
+    idt[256]; // Create an array of IDT entries; aligned for performance
 static idtr_t idtr;
 
 void exception_handler(uint32_t interrupt_num, uint32_t error_code) {
     if (interrupt_num == 14) {
         uint32_t faulting_address;
-        __asm__ volatile("mov %%cr2, %0" : "=r" (faulting_address));
+        __asm__ volatile("mov %%cr2, %0" : "=r"(faulting_address));
 
         printf("Page Fault at Virtual Address: 0x%x\n", faulting_address);
 
@@ -45,20 +45,21 @@ void exception_handler(uint32_t interrupt_num, uint32_t error_code) {
         }
 
     } else {
-        printf("KERNEL PANIC! CPU EXCEPTION: %d\nERROR CODE: 0x%x\n", interrupt_num, error_code);
+        printf("KERNEL PANIC! CPU EXCEPTION: %d\nERROR CODE: 0x%x\n",
+               interrupt_num, error_code);
     }
 
     panic("Unhandled Hardware Exception!");
 }
 
-void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {
-    idt_entry_t* descriptor = &idt[vector];
+void idt_set_descriptor(uint8_t vector, void *isr, uint8_t flags) {
+    idt_entry_t *descriptor = &idt[vector];
 
-    descriptor->isr_low        = (uint32_t)isr & 0xFFFF;
-    descriptor->kernel_cs      = 0x08; // kernel cdoe selector
-    descriptor->attributes     = flags;
-    descriptor->isr_high       = (uint32_t)isr >> 16;
-    descriptor->reserved       = 0;
+    descriptor->isr_low = (uint32_t)isr & 0xFFFF;
+    descriptor->kernel_cs = 0x08; // kernel cdoe selector
+    descriptor->attributes = flags;
+    descriptor->isr_high = (uint32_t)isr >> 16;
+    descriptor->reserved = 0;
 }
 
 void idt_init() {
@@ -70,17 +71,21 @@ void idt_init() {
         vectors[vector] = true;
     }
 
-    pic_remap(0x20, 0x28); // Start Master interrupts at IDT index 32 (0x20), and Slave interrupts at IDT index 40 (0x28)
+    pic_remap(0x20, 0x28); // Start Master interrupts at IDT index 32 (0x20),
+                           // and Slave interrupts at IDT index 40 (0x28)
 
-    idt_set_descriptor(32, isr_apic_timer, 0x8E); // The Timer
-    idt_set_descriptor(39, isr_spurious, 0x8E);   // The Spurious Interrupt
-    idt_set_descriptor(33, irq_stub_1, 0x8E); // The keyboard
+    idt_set_descriptor(
+        200, isr_apic_timer,
+        0x8E); // The Timer at index 200, as to not collide with legacy pics
+    idt_set_descriptor(39, isr_spurious, 0x8E); // The Spurious Interrupt
+    idt_set_descriptor(33, irq_stub_1, 0x8E);   // The keyboard
+    idt_set_descriptor(47, isr_spurious, 0x8E); // The Slave Spurious Interrupt
 
-    __asm__ volatile ("lidt %0" : : "m"(idtr)); // Load the new IDT
+    __asm__ volatile("lidt %0" : : "m"(idtr)); // Load the new IDT
 
     inb(0x60);
-    
-    __asm__ volatile ("sti"); // set the new interrupt flag
+
+    __asm__ volatile("sti"); // set the new interrupt flag
 }
 
 void irq_handler(uint32_t irq) {
@@ -88,5 +93,11 @@ void irq_handler(uint32_t irq) {
         keyboard_handler();
     }
 
+    // Check if came from slave
+    if (irq >= 8) {
+        outb(0xA0, 0x20); // Send to slave
+    }
+
+    // Send to master
     outb(0x20, 0x20);
 }

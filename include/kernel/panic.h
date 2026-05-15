@@ -1,6 +1,6 @@
 #ifndef PANIC_H
 #define PANIC_H
 
-__attribute__((noreturn)) void panic(const char* message);
+__attribute__((noreturn)) void panic(const char *message);
 
 #endif

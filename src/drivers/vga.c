@@ -1,7 +1,7 @@
-#include <drivers/vga.h>
 #include <arch/i386/io.h>
+#include <drivers/vga.h>
 
-static char *fb = (char *) 0x000B8000 + 0xC0000000;
+static char *fb = (char *)0x000B8000 + 0xC0000000;
 static uint32_t cursor_pos = 0;
 
 static uint8_t current_color = FB_WHITE | (FB_BLACK << 4);
@@ -20,7 +20,7 @@ void fb_move_cursor(uint16_t pos) {
     outb(FB_DATA_PORT, ((pos >> 8) & 0x00FF));
     outb(FB_COMMAND_PORT, FB_LOW_BYTE_COMMAND);
     outb(FB_DATA_PORT, pos & 0x00FF);
-}  
+}
 
 static void scroll() {
     for (int i = 0; i < 3840; i++) {
@@ -32,7 +32,7 @@ static void scroll() {
         fb[i + 1] = 0x0F;
     }
 
-    cursor_pos = 3840; 
+    cursor_pos = 3840;
 }
 
 void vga_putchar(char c) {
@@ -46,7 +46,8 @@ void vga_putchar(char c) {
         cursor_pos += 2;
     }
 
-    if (cursor_pos >= 4000) scroll(); 
+    if (cursor_pos >= 4000)
+        scroll();
     fb_move_cursor(cursor_pos / 2);
 }
 
@@ -55,6 +56,6 @@ void vga_clear_screen() {
         fb_write_cell(i * 2, ' ', FB_WHITE, FB_BLACK);
     }
     cursor_pos = 0;
-    
+
     fb_move_cursor(0);
 }

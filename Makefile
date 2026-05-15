@@ -7,7 +7,7 @@ OBJECTS = src/boot/loader.o $(filter-out src/boot/loader.o, $(ALL_OBJECTS))
 
 CC = i686-elf-gcc
 
-CFLAGS = -ffreestanding -Wall -Wextra -Werror -I include -c -g -os
+CFLAGS = -ffreestanding -Wall -Wextra -Werror -I include -c -g
 
 LDFLAGS = -T link.ld -nostdlib
 

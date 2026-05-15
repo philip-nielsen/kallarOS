@@ -14,7 +14,7 @@ void pic_remap(int offset1, int offset2) {
 
     // Set the vector offsets
     outb(PIC1_DATA, offset1); // Master PIC vector offset
-    outb(PIC2_DATA, offset2); //Slave PIC offset
+    outb(PIC2_DATA, offset2); // Slave PIC offset
 
     outb(PIC1_DATA, 4); // Slave PIC at IRQ2
     outb(PIC2_DATA, 2); // Cascade identity
@@ -28,6 +28,6 @@ void pic_remap(int offset1, int offset2) {
     outb(PIC2_DATA, a2);
 
     // Unmasking keyboard
-    outb(0x21, 0xFD); 
+    outb(0x21, 0xFD);
     outb(0xA1, 0xFF);
 }
