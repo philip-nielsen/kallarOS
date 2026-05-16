@@ -33,6 +33,7 @@ void map_page(uint32_t virt_addr, uint32_t phys_addr, uint32_t flags) {
         }
 
         RECURSIVE_TABLE_PTR(dir_index)[tab_index] = phys_addr | flags;
+        __asm__ volatile("invlpg (%0)" ::"r"(virt_addr) : "memory");
 
     } else {
         if (!(kernel_directory[dir_index] & PDE_PRESENT)) {

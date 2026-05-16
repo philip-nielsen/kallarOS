@@ -3,7 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-uint32_t malloc(size_t bytes);
+uint32_t kmalloc(size_t bytes);
 void kfree(uint32_t address);
+void kmalloc_init();
 
 #endif

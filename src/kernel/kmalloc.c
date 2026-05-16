@@ -12,10 +12,9 @@ typedef struct current {
 
 static block_header_t *free_list_head = 0;
 
-extern uint32_t kernel_end;
-static uint32_t heap_watermark = (uint32_t)&kernel_end + 0x50000;
+static uint32_t heap_watermark = 0;
 
-uint32_t malloc(size_t bytes_to_allocate) {
+uint32_t kmalloc(size_t bytes_to_allocate) {
     if (bytes_to_allocate <= 0) {
         return 0x0;
     }
@@ -73,7 +72,7 @@ uint32_t malloc(size_t bytes_to_allocate) {
         heap_watermark += 4096;
     }
 
-    uint32_t remaining_space = pages_needed - real_size;
+    uint32_t remaining_space = (pages_needed * 4096) - real_size;
     block_header_t *new_block = (block_header_t *)new_block_addr;
 
     if (remaining_space >= sizeof(block_header_t) + 4) {
@@ -92,7 +91,7 @@ uint32_t malloc(size_t bytes_to_allocate) {
             previous->next_free_slot = last_block;
         }
     } else {
-        new_block->size_and_flags = pages_needed & ~0x1;
+        new_block->size_and_flags = (pages_needed * 4096) & ~0x1;
     }
 
     return new_block_addr + sizeof(block_header_t);
@@ -103,7 +102,7 @@ void kfree(uint32_t address) {
         (block_header_t *)(address - sizeof(block_header_t));
 
     if (current->size_and_flags & 0x1) {
-        printf("Use after free for %d\n", address);
+        printf("Use after free for 0x%x\n", address);
         panic("USE AFTER FREE!");
     }
 
@@ -127,11 +126,9 @@ void kfree(uint32_t address) {
     uint32_t current_size = current->size_and_flags & ~0x1;
 
     if (head != 0) {
-        if ((uint32_t)current + current_size ==
-            (uint32_t)head->next_free_slot) {
-            current->size_and_flags +=
-                (head->next_free_slot->size_and_flags & ~0x1);
-            current->next_free_slot = head->next_free_slot->next_free_slot;
+        if ((uint32_t)current + current_size == (uint32_t)head) {
+            current->size_and_flags += (head->size_and_flags & ~0x1);
+            current->next_free_slot = head->next_free_slot;
         }
     }
 
@@ -142,4 +139,10 @@ void kfree(uint32_t address) {
             prev->next_free_slot = current->next_free_slot;
         }
     }
+}
+
+void kmalloc_init() {
+    extern uint32_t kernel_end;
+    uint32_t watermark = (uint32_t)&kernel_end + 0x400000; // 4 MB after kernel
+    heap_watermark = (watermark + 0xFFF) & ~0xFFF;
 }

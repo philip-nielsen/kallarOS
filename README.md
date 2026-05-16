@@ -9,16 +9,20 @@ Currently, the kernel successfully boots into a fully paged virtual memory envir
 ## Getting Started
 
 ### Prerequisites
+
 If you're on a debian-based system, simply run `build_toolchain.sh` to build the whole toolchain, including the cross-compiler.
 
 ### Building and Running
+
 Once the toolchain is built, use the Makefile to compile the kernel and launch it in QEMU:
+
 - `make` - Builds the kernel and creates a bootable ISO image.
 - `make run` - Builds the kernel and runs it in QEMU.
 - `make clean` - Cleans up build artifacts.
 - `make debug` - Boots the OS paused, waiting for a GDB connection on port 1234
 
 ### Roadmap
+
 - [x] Bootloader
 - [x] VGA Text Mode Driver
 - [x] GDT (Global Descriptor Table)
@@ -28,9 +32,9 @@ Once the toolchain is built, use the Makefile to compile the kernel and launch i
 - [x] Basic Error Printing
 - [x] The APIC (System timer & heartbeat)
 - [x] Memory Management (Physical RAM & Paging)
-- [ ] Kernel Heap (`malloc` & `free`)
-- [ ] Multitasking
-- [ ] User Space (Ring 3) & System Calls
+- [x] Kernel Heap (`kmalloc` & `kfree`)
+- [ ] Multitasking (Threads & Scheduling)
 - [ ] Disk Driver (ATA)
 - [ ] File System (FAT32/ext2)
+- [ ] User Space (Ring 3) & System Calls
 - [ ] ELF Loader (Running actual programs!)
