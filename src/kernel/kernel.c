@@ -5,10 +5,12 @@
 #include <arch/i386/multiboot.h>
 #include <arch/i386/paging.h>
 #include <drivers/vga.h>
+#include <kernel/kmalloc.h>
 #include <kernel/panic.h>
 #include <kernel/pmm.h>
 #include <kernel/timer.h>
 #include <libc/stdio.h>
+#include <tests/tests.h>
 
 #include <stdint.h>
 
@@ -48,6 +50,10 @@ int kmain(multiboot_info_t *mbd, uint32_t magic) {
 
     apic_start_timer();
     printf("APIC timer started\n");
+
+    printf("Checking kernel heap\n");
+    kmalloc_init();
+    kmalloc_run_test();
 
     uint32_t uptime_seconds = 0;
     char spinner[] = {'|', '/', '-', '\\'};
