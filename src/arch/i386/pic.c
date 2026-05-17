@@ -1,7 +1,7 @@
 #include <arch/i386/io.h>
 #include <arch/i386/pic.h>
 
-void pic_remap(int offset1, int offset2) {
+void pic_remap(uint8_t offset1, uint8_t offset2) {
     uint8_t a1, a2;
 
     // Save current masks

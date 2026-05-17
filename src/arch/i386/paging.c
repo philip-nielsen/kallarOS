@@ -9,7 +9,7 @@
     ((page_table_entry_t *)(0xFFC00000 + ((dir_index) * 0x1000)))
 
 static page_directory_entry_t *kernel_directory = 0;
-static int paging_enabled = 0;
+static uint8_t paging_enabled = 0;
 
 void map_page(uint32_t virt_addr, uint32_t phys_addr, uint32_t flags) {
     uint32_t dir_index = virt_addr >> 22;
@@ -68,11 +68,11 @@ void alloc_page(uint32_t virt_addr, uint32_t flags) {
         panic("Virtual address already mapped!\n");
     }
 
-    uint32_t address = pmm_alloc_frame();
-    if (address == 0) {
+    uint32_t phys_addr = pmm_alloc_frame();
+    if (phys_addr == 0) {
         panic("Out of RAM\n");
     }
-    map_page(virt_addr, address, flags);
+    map_page(virt_addr, phys_addr, flags);
 }
 
 void free_page(uint32_t virt_addr) {
@@ -92,7 +92,7 @@ void free_page(uint32_t virt_addr) {
 
     uint32_t frame_phys =
         RECURSIVE_TABLE_PTR(dir_index)[tab_index] & PTE_FRAME_MASK;
-    pmm_free_frame((void *)frame_phys);
+    pmm_free_frame(frame_phys);
     unmap_page(virt_addr);
 }
 

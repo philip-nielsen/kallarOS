@@ -27,10 +27,49 @@ typedef enum {
     FB_WHITE = 15
 } vga_color_t;
 
+/**
+ * fb_write_cell() - Writes a character and its color to the framebuffer.
+ * @i: The byte offset index in the framebuffer array.
+ * @c: The ASCII character to write.
+ * @fg: The foreground color.
+ * @bg: The background color.
+ *
+ * Writes the character byte followed by the combined color attribute byte
+ * directly to the VGA memory mapping.
+ */
 void fb_write_cell(uint32_t i, char c, uint8_t fg, uint8_t bg);
+
+/**
+ * fb_move_cursor() - Moves the hardware blinking cursor to the desired
+ * position.
+ * @pos: The character cell index (0 to 1999) to move the cursor to.
+ */
 void fb_move_cursor(uint16_t pos);
+
+/**
+ * vga_clear_screen() - Clears the entire VGA text-mode screen.
+ * * Overwrites the entire framebuffer with whitespace, sets the background
+ * to black, and resets the hardware cursor to the top-left (position 0).
+ */
 void vga_clear_screen(void);
+
+/**
+ * vga_putchar() - Prints a character to the screen at the current cursor
+ * position.
+ * @c: Character to write to the framebuffer.
+ *
+ * Supports special characters like '\n' and '\r'. Automatically handles
+ * advancing the cursor and scrolling the terminal if the bottom of the
+ * screen is reached.
+ */
 void vga_putchar(char c);
+
+/**
+ * vga_set_color() - Sets the active global foreground and background colors.
+ * @fg: Foreground color to set.
+ * @bg: Background color to set.
+ * * Affects all subsequent calls to vga_putchar().
+ */
 void vga_set_color(vga_color_t fg, vga_color_t bg);
 
 #endif

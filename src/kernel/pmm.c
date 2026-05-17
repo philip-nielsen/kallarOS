@@ -44,7 +44,7 @@ void pmm_mark_used(uint32_t physical_addr) {
     }
 }
 
-void pmm_mark_free(uint32_t physical_addr) {
+void pmm_free_frame(uint32_t physical_addr) {
     uint32_t frame_index = physical_addr / 4096;
     if (frame_index >= pmm.max_blocks)
         return;
@@ -160,8 +160,4 @@ uint32_t pmm_alloc_frame() {
     }
 
     return 0;
-}
-
-void pmm_free_frame(void *physical_addr) {
-    pmm_mark_free((uint32_t)physical_addr);
 }

@@ -3,10 +3,19 @@
 
 #include <stdint.h>
 
-// Sends the given data to the given I/O port
+/**
+ * outb() - Sends the given data to the given I/O port.
+ * @port: The 16-bit I/O port to write to.
+ * @data: The 8-bit value to send to the port.
+ */
 void outb(uint16_t port, uint8_t data);
 
-// Reads a byte from the given I/O port
+/**
+ * inb() - Reads the current data from the given I/O port.
+ * @port: The 16-bit I/O port to read from.
+ *
+ * Return: The 8-bit value read from the specified port.
+ */
 uint8_t inb(uint16_t port);
 
 #endif
