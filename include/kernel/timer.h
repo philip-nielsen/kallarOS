@@ -9,7 +9,7 @@
  * Uses the system tick counter to halt the CPU (`hlt` instruction) in a
  * loop until the desired time has elapsed.
  *
- * * Note: Because the underlying APIC timer ticks every 10ms, this function
+ * Note: Because the underlying APIC timer ticks every 10ms, this function
  * has a 10ms granularity. The requested time will be rounded down to the
  * nearest 10ms interval (e.g., 15ms becomes 10ms).
  */

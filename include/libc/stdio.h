@@ -27,11 +27,11 @@ int puts(const char *chars);
  * @...: Variadic arguments.
  *
  * WARNING: This is not a full POSIX printf. It currently ONLY supports:
- * * %d - Signed 32-bit integers
- * * %x - Hexadecimal integers (lowercase)
- * * %s - Null-terminated strings
- * * %c - Single characters
- * * %% - Literal percent sign
+ * %d - Signed 32-bit integers
+ * %x - Hexadecimal integers (lowercase)
+ * %s - Null-terminated strings
+ * %c - Single characters
+ * %% - Literal percent sign
  * Does NOT support padding, width, floats, or long longs.
  *
  * Return: 0 (Note: Standard printf returns characters printed, this does not).

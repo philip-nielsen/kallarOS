@@ -48,7 +48,7 @@ void fb_move_cursor(uint16_t pos);
 
 /**
  * vga_clear_screen() - Clears the entire VGA text-mode screen.
- * * Overwrites the entire framebuffer with whitespace, sets the background
+ * Overwrites the entire framebuffer with whitespace, sets the background
  * to black, and resets the hardware cursor to the top-left (position 0).
  */
 void vga_clear_screen(void);
@@ -68,7 +68,7 @@ void vga_putchar(char c);
  * vga_set_color() - Sets the active global foreground and background colors.
  * @fg: Foreground color to set.
  * @bg: Background color to set.
- * * Affects all subsequent calls to vga_putchar().
+ * Affects all subsequent calls to vga_putchar().
  */
 void vga_set_color(vga_color_t fg, vga_color_t bg);
 

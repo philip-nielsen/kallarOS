@@ -5,7 +5,7 @@
 
 /**
  * initGdt() - Initializes the GDT.
- * * Sets up all the correct segments for the x86 global descriptor table.
+ * Sets up all the correct segments for the x86 global descriptor table.
  */
 void initGdt(void);
 
