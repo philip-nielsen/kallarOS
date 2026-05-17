@@ -28,13 +28,14 @@ void pmm_mark_used(uint32_t physical_addr);
 /**
  * pmm_alloc_frame() - Allocates the next available 4KB frame of physical
  * memory.
- * * Scans the bitmap to find the first available free frame, marks it as used,
- * and returns its address.
+ * Scans the bitmap to find the first available free frame, marks it as used,
+ * and returns its address. Searches in 32-bit chunks and uses GCC's
+ * __builtin_ctz to instantly find the first free bit within the chunk.
  *
  * Return: The physical address of the allocated 4KB frame, or 0 if out of
  * memory.
  */
-uint32_t pmm_alloc_frame();
+uint32_t pmm_alloc_frame(void);
 
 /**
  * pmm_free_frame() - Releases a previously allocated 4KB physical frame.

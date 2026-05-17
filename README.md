@@ -1,6 +1,6 @@
 # KallarOS
 
-A hobby x86 32-bit operating system built from scatch in C and assembly. The goal of this project is to learn about operating system development, low-level programming and to have fun :)!
+A hobby x86 32-bit operating system built from scatch in C and assembly. The goal of this project is to learn about operating system development, low-level programming and to have fun! :)
 
 Currently, the kernel successfully boots into a fully paged virtual memory environment, complete with physical/virtual memory allocators, hardware interrupts (IDT/PIC), an APIC system timer, and a basic VGA text-mode driver.
 
@@ -11,6 +11,8 @@ Currently, the kernel successfully boots into a fully paged virtual memory envir
 ### Prerequisites
 
 If you're on a debian-based system, simply run `build_toolchain.sh` to build the whole toolchain, including the cross-compiler.
+
+It runs on Binutils(2.41) and GCC(13.2.0)
 
 ### Building and Running
 

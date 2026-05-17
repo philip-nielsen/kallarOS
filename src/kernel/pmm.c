@@ -143,20 +143,27 @@ void pmm_init(multiboot_info_t *mbd, uint32_t bitmap_addr) {
 }
 
 uint32_t pmm_alloc_frame() {
-    for (uint32_t i = pmm.last_allocated_bit; i < pmm.max_blocks; i++) {
-        if (!bitmap_check(i)) {
-            pmm_mark_used(i * 4096);
-            pmm.last_allocated_bit = i;
-            return (uint32_t)i * 4096;
-        }
-    }
+    uint32_t array_size = (pmm.max_blocks + 31) / 32;
+    uint32_t start_index = pmm.last_allocated_bit / 32;
 
-    for (uint32_t i = 0; i < pmm.last_allocated_bit; i++) {
-        if (!bitmap_check(i)) {
-            pmm_mark_used(i * 4096);
-            pmm.last_allocated_bit = i;
-            return (uint32_t)i * 4096;
+    for (uint32_t i = 0; i < array_size; i++) {
+        uint32_t current_index = (start_index + i) % array_size;
+        uint32_t bit_chunk = pmm.array[current_index];
+
+        if (bit_chunk == 0xFFFFFFFF) {
+            continue;
         }
+
+        uint32_t free_bit_offset = __builtin_ctz(~bit_chunk);
+        uint32_t bit_index = current_index * 32 + free_bit_offset;
+
+        if (bit_index >= pmm.max_blocks) {
+            return 0;
+        }
+
+        pmm_mark_used(bit_index * 4096);
+        pmm.last_allocated_bit = bit_index;
+        return bit_index * 4096;
     }
 
     return 0;

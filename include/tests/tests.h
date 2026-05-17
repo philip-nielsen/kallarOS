@@ -6,6 +6,6 @@
  * Tests allocation, fragmentation and the first fit logic.
  * Context: Causes Kernel Panic if the tests fails.
  */
-void kmalloc_run_test();
+void kmalloc_run_test(void);
 
 #endif
