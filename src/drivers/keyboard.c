@@ -18,7 +18,7 @@ void keyboard_handler() {
 
         if (c != 0) {
             char str[2] = {c, '\0'};
-            printf(str);
+            printf("%s", str);
         }
     }
 }

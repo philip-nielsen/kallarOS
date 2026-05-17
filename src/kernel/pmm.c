@@ -135,7 +135,8 @@ void pmm_init(multiboot_info_t *mbd, uint32_t bitmap_addr) {
                          (uint32_t)&kernel_end - 0xC0000000);
 
     // Protect bitmap
-    pmm_mark_region_used(bitmap_addr, bitmap_addr + bitmap_size_bytes);
+    pmm_mark_region_used(bitmap_addr - 0xC0000000,
+                         bitmap_addr + bitmap_size_bytes - 0xC0000000);
 
     // Protect first 1MB (BIOS, VGA buffer, etc.)
     pmm_mark_region_used(0, 0x100000);

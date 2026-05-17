@@ -4,7 +4,7 @@ void *memcpy(void *restrict dst, const void *restrict src, size_t n) {
     char *dst_bytes = (char *)dst;
     const char *src_bytes = (char *)src;
 
-    for (size_t i = 0; i < n; i += 4) {
+    for (size_t i = 0; i < n; i++) {
         dst_bytes[i] = src_bytes[i];
     }
     return dst;
@@ -12,7 +12,7 @@ void *memcpy(void *restrict dst, const void *restrict src, size_t n) {
 
 void *memset(void *ptr, int x, size_t n) {
     unsigned char *p = (unsigned char *)ptr;
-    for (size_t i = 0; i < n; i += 4) {
+    for (size_t i = 0; i < n; i++) {
         p[i] = (unsigned char)x;
     }
     return ptr;

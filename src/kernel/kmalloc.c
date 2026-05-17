@@ -20,7 +20,7 @@ uint32_t kmalloc(size_t bytes_to_allocate) {
     }
 
     uint32_t real_size =
-        (bytes_to_allocate + sizeof(block_header_t) + 3) & ~0x3;
+        (bytes_to_allocate + sizeof(block_header_t) + 15) & ~0xF;
 
     block_header_t *current = free_list_head;
     block_header_t *previous = 0;
