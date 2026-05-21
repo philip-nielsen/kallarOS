@@ -8,6 +8,7 @@
 #include <kernel/kmalloc.h>
 #include <kernel/panic.h>
 #include <kernel/pmm.h>
+#include <kernel/task.h>
 #include <kernel/timer.h>
 #include <libc/stdio.h>
 #include <tests/tests.h>
@@ -15,6 +16,27 @@
 #include <stdint.h>
 
 extern uint32_t kernel_end;
+
+void yield() {
+    thread_control_block_t *prev = get_current_thread();
+    set_current_thread(prev->next);
+    thread_control_block_t *current_thread = get_current_thread();
+    switch_to_task(&prev->esp, current_thread->esp);
+}
+
+void task_a() {
+    for (;;) {
+        printf("A");
+        yield();
+    }
+}
+
+void task_b() {
+    for (;;) {
+        printf("B");
+        yield();
+    }
+}
 
 int kmain(multiboot_info_t *mbd, uint32_t magic) {
     vga_clear_screen();
@@ -55,15 +77,31 @@ int kmain(multiboot_info_t *mbd, uint32_t magic) {
     kmalloc_init();
     kmalloc_run_test();
 
-    uint32_t uptime_seconds = 0;
-    char spinner[] = {'|', '/', '-', '\\'};
+    initialize_multitasking();
+    printf("Multitasking initialized\n");
 
-    printf("System Uptime: \n");
+    thread_control_block_t *thread_a = create_kernel_task(task_a);
+    thread_control_block_t *thread_b = create_kernel_task(task_b);
+    thread_control_block_t *current_thread = get_current_thread();
 
-    while (1) {
-        printf("\r  [%c] %d seconds active...", spinner[uptime_seconds % 4],
-               uptime_seconds);
-        sleep_ms(1000);
-        uptime_seconds++;
+    current_thread->next = thread_a;
+    thread_a->next = thread_b;
+    thread_b->next = current_thread;
+
+    for (;;) {
+        printf("M"); // Så vi ser när Main-tråden körs
+        yield();
     }
+
+    // uint32_t uptime_seconds = 0;
+    // char spinner[] = {'|', '/', '-', '\\'};
+
+    // printf("System Uptime: \n");
+
+    // while (1) {
+    //     printf("\r  [%c] %d seconds active...", spinner[uptime_seconds % 4],
+    //            uptime_seconds);
+    //     sleep_ms(1000);
+    //     uptime_seconds++;
+    // }
 }
