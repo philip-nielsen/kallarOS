@@ -18,6 +18,9 @@
 #define APIC_LVT_INT_MASKED 0x10000          // Bit 16
 #define APIC_LVT_TIMER_MODE_PERIODIC 0x20000 // Bit 17
 
+// IDT vector used for the APIC
+#define APIC_VECTOR 200
+
 volatile uint64_t system_ticks = 0;
 
 void apic_timer_handler() {
@@ -59,7 +62,8 @@ void apic_start_timer() {
 
     // Start internal APIC timer as periodic on IDT vector 200, divider 16,
     // using calibrated ticks
-    apic_write(APIC_REGISTER_LVT_TIMER, 200 | APIC_LVT_TIMER_MODE_PERIODIC);
+    apic_write(APIC_REGISTER_LVT_TIMER,
+               APIC_VECTOR | APIC_LVT_TIMER_MODE_PERIODIC);
     apic_write(APIC_REGISTER_TIMER_DIV, 0x3);
     apic_write(APIC_REGISTER_TIMER_INITCNT, ticksIn10ms);
 }

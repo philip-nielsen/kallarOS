@@ -7,6 +7,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define KEYBOARD_VECTOR 33
+#define SPURIOUS_INTERRUPTS_VECTOR 39
+#define SLAVE_INTERRUPTS_VECTOR 47
+#define APIC_VECTOR 200
+
 typedef struct {
     uint16_t isr_low;   // The lower 16 bits of the ISR's address
     uint16_t kernel_cs; // The GDT segment selector that the CPU will load into
@@ -89,11 +94,13 @@ void idt_init() {
                            // and Slave interrupts at IDT index 40 (0x28)
 
     idt_set_descriptor(
-        200, isr_apic_timer,
+        APIC_VECTOR, isr_apic_timer,
         0x8E); // The Timer at index 200, as to not collide with legacy pics
-    idt_set_descriptor(39, isr_spurious, 0x8E); // The Spurious Interrupt
-    idt_set_descriptor(33, irq_stub_1, 0x8E);   // The keyboard
-    idt_set_descriptor(47, isr_spurious, 0x8E); // The Slave Spurious Interrupt
+    idt_set_descriptor(SPURIOUS_INTERRUPTS_VECTOR, isr_spurious,
+                       0x8E); // The Spurious Interrupt
+    idt_set_descriptor(KEYBOARD_VECTOR, irq_stub_1, 0x8E); // The keyboard
+    idt_set_descriptor(SLAVE_INTERRUPTS_VECTOR, isr_spurious,
+                       0x8E); // The Slave Spurious Interrupt
 
     __asm__ volatile("lidt %0" : : "m"(idtr)); // Load the new IDT
 
