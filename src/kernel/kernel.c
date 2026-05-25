@@ -17,13 +17,6 @@
 
 extern uint32_t kernel_end;
 
-void yield() {
-    thread_control_block_t *prev = get_current_thread();
-    set_current_thread(prev->next);
-    thread_control_block_t *current_thread = get_current_thread();
-    switch_to_task(&prev->esp, current_thread->esp);
-}
-
 void task_a() {
     for (;;) {
         printf("A");
@@ -83,13 +76,15 @@ int kmain(multiboot_info_t *mbd, uint32_t magic) {
     thread_control_block_t *thread_a = create_kernel_task(task_a);
     thread_control_block_t *thread_b = create_kernel_task(task_b);
     thread_control_block_t *current_thread = get_current_thread();
+    thread_a->id = 1;
+    thread_b->id = 2;
 
     current_thread->next = thread_a;
     thread_a->next = thread_b;
     thread_b->next = current_thread;
 
     for (;;) {
-        printf("M"); // Så vi ser när Main-tråden körs
+        printf("M");
         yield();
     }
 

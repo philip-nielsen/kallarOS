@@ -18,6 +18,7 @@ typedef struct thread_control_block {
     thread_state state;
     uint8_t id;
     void *stack_base;
+    uint32_t time_used;
 } thread_control_block_t;
 
 extern void switch_to_task(void **old_esp_ptr, void *new_esp);
@@ -47,4 +48,13 @@ thread_control_block_t *get_current_thread();
  */
 void set_current_thread(thread_control_block_t *new_thread);
 
+/**
+ * yield() - Yields the current thread to the next in the queue.
+ */
+void yield(void);
+
+/**
+ * update_time_used() - Update the time used by a thread.
+ */
+void update_time_used(void);
 #endif

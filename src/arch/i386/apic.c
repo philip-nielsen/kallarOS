@@ -68,4 +68,4 @@ void apic_start_timer() {
     apic_write(APIC_REGISTER_TIMER_INITCNT, ticksIn10ms);
 }
 
-uint64_t apic_get_ticks(void) { return system_ticks; }
+uint64_t apic_get_ticks() { return system_ticks; }
