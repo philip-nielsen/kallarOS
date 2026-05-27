@@ -1,5 +1,6 @@
 #include <arch/i386/apic.h>
 #include <arch/i386/pit.h>
+#include <kernel/scheduler.h>
 #include <stdint.h>
 
 // Tthe memory address of the APIC's End Of Interrupt (EOI) register
@@ -28,6 +29,8 @@ void apic_timer_handler() {
 
     // Acknowledge the interrupt so the APIC sends the next one
     apic_write(APIC_REGISTER_EOI, 0);
+
+    scheduler_on_tick();
 }
 
 void apic_write(uint32_t reg, uint32_t value) {

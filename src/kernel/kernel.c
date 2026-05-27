@@ -8,7 +8,7 @@
 #include <kernel/kmalloc.h>
 #include <kernel/panic.h>
 #include <kernel/pmm.h>
-#include <kernel/task.h>
+#include <kernel/thread.h>
 #include <kernel/timer.h>
 #include <libc/stdio.h>
 #include <tests/tests.h>
@@ -19,15 +19,22 @@ extern uint32_t kernel_end;
 
 void task_a() {
     for (;;) {
+        for (int i = 0; i < 1000000; i++) {
+            __asm__ volatile("nop");
+        }
         printf("A");
-        yield();
+        // test_kernel_task();
     }
 }
 
 void task_b() {
     for (;;) {
+        for (int i = 0; i < 5000000; i++) {
+            __asm__ volatile("nop");
+        }
+
         printf("B");
-        yield();
+        // test_kernel_task();
     }
 }
 
@@ -73,19 +80,15 @@ int kmain(multiboot_info_t *mbd, uint32_t magic) {
     initialize_multitasking();
     printf("Multitasking initialized\n");
 
-    thread_control_block_t *thread_a = create_kernel_task(task_a);
-    thread_control_block_t *thread_b = create_kernel_task(task_b);
-    thread_control_block_t *current_thread = get_current_thread();
-    thread_a->id = 1;
-    thread_b->id = 2;
-
-    current_thread->next = thread_a;
-    thread_a->next = thread_b;
-    thread_b->next = current_thread;
+    create_kernel_thread(task_a);
+    create_kernel_thread(task_b);
 
     for (;;) {
+        for (int i = 0; i < 10000000; i++) {
+            __asm__ volatile("nop");
+        }
         printf("M");
-        yield();
+        // test_kernel_task();
     }
 
     // uint32_t uptime_seconds = 0;
