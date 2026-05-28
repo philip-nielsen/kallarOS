@@ -9,6 +9,7 @@ static volatile uint8_t counter;
 
 static thread_control_block_t *first_ready_to_run_thread_list[3];
 static thread_control_block_t *last_ready_to_run_thread_list[3];
+static thread_control_block_t *sleeping_thread_queue;
 
 void enqueue_thread(thread_control_block_t *thread, uint8_t thread_priority) {
     thread->next = NULL;
@@ -90,6 +91,10 @@ void yield() {
         next_thread = get_idle_thread();
     }
 
+    if (prev == next_thread) {
+        return;
+    }
+
     next_thread->state = THREAD_RUNNING;
     set_current_thread(next_thread);
 
@@ -133,6 +138,24 @@ void unlock_scheduler() {
 }
 
 void scheduler_on_tick() {
+    thread_control_block_t *current_sleep_head = sleeping_thread_queue;
+    thread_control_block_t *prev_sleep_head = NULL;
+    while (current_sleep_head) {
+        thread_control_block_t *temp_sleep_head = current_sleep_head->next;
+        if (current_sleep_head->wake_time <= apic_get_ticks()) {
+            current_sleep_head->state = THREAD_READY;
+            if (!prev_sleep_head) {
+                sleeping_thread_queue = sleeping_thread_queue->next;
+            } else {
+                prev_sleep_head->next = current_sleep_head->next;
+            }
+            enqueue_thread(current_sleep_head, 0);
+        } else {
+            prev_sleep_head = current_sleep_head;
+        }
+        current_sleep_head = temp_sleep_head;
+    }
+
     thread_control_block_t *current_thread = get_current_thread();
 
     uint8_t needs_yield = 0;
@@ -177,4 +200,27 @@ void scheduler_on_tick() {
         yield();
         unlock_scheduler();
     }
+}
+
+void thread_sleep(thread_control_block_t *thread, uint32_t requested_time) {
+    lock_scheduler();
+    thread->next = NULL;
+    thread->wake_time = apic_get_ticks() + requested_time;
+    thread->state = THREAD_SLEEPING;
+
+    if (!sleeping_thread_queue) {
+        sleeping_thread_queue = thread;
+        yield();
+        unlock_scheduler();
+        return;
+    }
+
+    thread_control_block_t *current_sleep_head = sleeping_thread_queue;
+    while (current_sleep_head->next) {
+        current_sleep_head = current_sleep_head->next;
+    }
+
+    current_sleep_head->next = thread;
+    yield();
+    unlock_scheduler();
 }

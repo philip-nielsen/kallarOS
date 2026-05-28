@@ -10,6 +10,12 @@ static thread_control_block_t *current_thread;
 static thread_control_block_t *idle_thread;
 static uint32_t id;
 
+static void idle_thread_method() {
+    for (;;) {
+        __asm__ volatile("hlt");
+    }
+}
+
 void initialize_multitasking() {
     thread_control_block_t *root_thread =
         (thread_control_block_t *)kmalloc(sizeof(thread_control_block_t));
@@ -32,7 +38,7 @@ void initialize_multitasking() {
     idle_stack[2] = 0;     // pop ebx
     idle_stack[3] = 0;     // pop ebp
     idle_stack[4] = 0x202; // popfd (EFLAGS with interrupts enabled)
-    idle_stack[5] = (uint32_t)idle_thread; // ret
+    idle_stack[5] = (uint32_t)idle_thread_method; // ret
 
     idle_thread->esp = (void *)idle_stack;
     idle_thread->stack_base = (void *)idle_stack_base;
@@ -74,13 +80,7 @@ void set_current_thread(thread_control_block_t *new_thread) {
     current_thread = new_thread;
 }
 
-static void idle_thread_method() {
-    for (;;) {
-        __asm__ volatile("hlt");
-    }
-}
-
-void *get_idle_thread() { return idle_thread_method; }
+thread_control_block_t *get_idle_thread() { return idle_thread; }
 
 void test_kernel_task() {
     lock_scheduler();

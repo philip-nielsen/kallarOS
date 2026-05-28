@@ -25,4 +25,6 @@ thread_control_block_t *dequeue_thread(void);
 
 void scheduler_on_tick(void);
 
+void thread_sleep(thread_control_block_t *thread, uint32_t requested_time);
+
 #endif

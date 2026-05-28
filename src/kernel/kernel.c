@@ -8,6 +8,7 @@
 #include <kernel/kmalloc.h>
 #include <kernel/panic.h>
 #include <kernel/pmm.h>
+#include <kernel/scheduler.h>
 #include <kernel/thread.h>
 #include <kernel/timer.h>
 #include <libc/stdio.h>
@@ -19,22 +20,15 @@ extern uint32_t kernel_end;
 
 void task_a() {
     for (;;) {
-        for (int i = 0; i < 1000000; i++) {
-            __asm__ volatile("nop");
-        }
         printf("A");
-        // test_kernel_task();
+        thread_sleep(get_current_thread(), 500);
     }
 }
 
 void task_b() {
     for (;;) {
-        for (int i = 0; i < 5000000; i++) {
-            __asm__ volatile("nop");
-        }
-
         printf("B");
-        // test_kernel_task();
+        thread_sleep(get_current_thread(), 1000);
     }
 }
 
@@ -84,11 +78,8 @@ int kmain(multiboot_info_t *mbd, uint32_t magic) {
     create_kernel_thread(task_b);
 
     for (;;) {
-        for (int i = 0; i < 10000000; i++) {
-            __asm__ volatile("nop");
-        }
         printf("M");
-        // test_kernel_task();
+        thread_sleep(get_current_thread(), 2000);
     }
 
     // uint32_t uptime_seconds = 0;
@@ -99,7 +90,7 @@ int kmain(multiboot_info_t *mbd, uint32_t magic) {
     // while (1) {
     //     printf("\r  [%c] %d seconds active...", spinner[uptime_seconds % 4],
     //            uptime_seconds);
-    //     sleep_ms(1000);
+    //     thread_sleep(get_current_thread(), 1000);
     //     uptime_seconds++;
     // }
 }

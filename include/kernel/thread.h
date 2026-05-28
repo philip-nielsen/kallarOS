@@ -26,6 +26,7 @@ typedef struct thread_control_block {
     thread_state state;
     void *stack_base;
     uint32_t time_used;
+    uint32_t wake_time;
     uint8_t priority;
     int8_t remaining_time;
     uint8_t id;
@@ -63,6 +64,6 @@ void test_kernel_task(void);
 /**
  * get_idle_thread() - Get pointer to the isolated idle thread.
  */
-void *get_idle_thread(void);
+thread_control_block_t *get_idle_thread(void);
 
 #endif
