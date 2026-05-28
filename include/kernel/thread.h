@@ -59,8 +59,6 @@ thread_control_block_t *get_current_thread();
  */
 void set_current_thread(thread_control_block_t *new_thread);
 
-void test_kernel_task(void);
-
 /**
  * get_idle_thread() - Get pointer to the isolated idle thread.
  */

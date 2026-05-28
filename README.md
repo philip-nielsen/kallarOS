@@ -35,7 +35,7 @@ Once the toolchain is built, use the Makefile to compile the kernel and launch i
 - [x] The APIC (System timer & heartbeat)
 - [x] Memory Management (Physical RAM & Paging)
 - [x] Kernel Heap (`kmalloc` & `kfree`)
-- [ ] Multitasking (Threads & Scheduling)
+- [ ] Multitasking (Threads & Scheduling) Work in Progress
 - [ ] Disk Driver (ATA)
 - [ ] File System (FAT32/ext2)
 - [ ] User Space (Ring 3) & System Calls

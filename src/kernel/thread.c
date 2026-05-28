@@ -81,9 +81,3 @@ void set_current_thread(thread_control_block_t *new_thread) {
 }
 
 thread_control_block_t *get_idle_thread() { return idle_thread; }
-
-void test_kernel_task() {
-    lock_scheduler();
-    yield();
-    unlock_scheduler();
-}
