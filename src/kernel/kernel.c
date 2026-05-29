@@ -19,16 +19,26 @@
 extern uint32_t kernel_end;
 
 void task_a() {
+    unlock_scheduler();
     for (;;) {
         printf("A");
-        thread_sleep(get_current_thread(), 500);
+        thread_sleep(get_current_thread(), 50);
     }
 }
 
 void task_b() {
+    unlock_scheduler();
     for (;;) {
         printf("B");
-        thread_sleep(get_current_thread(), 1000);
+        thread_sleep(get_current_thread(), 100);
+    }
+}
+
+void task_c() {
+    unlock_scheduler();
+    for (int i = 0; i < 5; i++) {
+        printf("C");
+        thread_sleep(get_current_thread(), 100);
     }
 }
 
@@ -79,7 +89,8 @@ int kmain(multiboot_info_t *mbd, uint32_t magic) {
 
     for (;;) {
         printf("M");
-        thread_sleep(get_current_thread(), 2000);
+        create_kernel_thread(task_c);
+        thread_sleep(get_current_thread(), 200);
     }
 
     // uint32_t uptime_seconds = 0;

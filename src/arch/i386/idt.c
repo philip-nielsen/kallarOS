@@ -43,7 +43,7 @@ void exception_handler(uint32_t interrupt_num, uint32_t error_code) {
         uint32_t faulting_address;
         __asm__ volatile("mov %%cr2, %0" : "=r"(faulting_address));
 
-        printf("Page Fault at Virtual Address: 0x%x\n", faulting_address);
+        printf("\nPage Fault at Virtual Address: 0x%x\n", faulting_address);
 
         if ((error_code & 0x1) == 0) {
             printf("Page not present\n");
@@ -64,7 +64,7 @@ void exception_handler(uint32_t interrupt_num, uint32_t error_code) {
         }
 
     } else {
-        printf("KERNEL PANIC! CPU EXCEPTION: %d\nERROR CODE: 0x%x\n",
+        printf("\nKERNEL PANIC! CPU EXCEPTION: %d\nERROR CODE: 0x%x\n",
                interrupt_num, error_code);
     }
 

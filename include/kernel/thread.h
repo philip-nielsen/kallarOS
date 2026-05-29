@@ -27,9 +27,9 @@ typedef struct thread_control_block {
     void *stack_base;
     uint32_t time_used;
     uint32_t wake_time;
+    uint32_t id;
     uint8_t priority;
     int8_t remaining_time;
-    uint8_t id;
 } thread_control_block_t;
 
 extern void switch_to_task(void **old_esp_ptr, void *new_esp);

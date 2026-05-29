@@ -27,4 +27,10 @@ void scheduler_on_tick(void);
 
 void thread_sleep(thread_control_block_t *thread, uint32_t requested_time);
 
+void thread_exit(void);
+
+thread_control_block_t *get_terminated_thread_queue();
+
+void set_terminated_thread_queue(thread_control_block_t *new_queue);
+
 #endif

@@ -7,9 +7,12 @@
 static uint8_t IRQ_disable_counter;
 static volatile uint8_t counter;
 
+// The MLFQ queues
 static thread_control_block_t *first_ready_to_run_thread_list[3];
 static thread_control_block_t *last_ready_to_run_thread_list[3];
+
 static thread_control_block_t *sleeping_thread_queue;
+static thread_control_block_t *terminated_thread_queue;
 
 void enqueue_thread(thread_control_block_t *thread, uint8_t thread_priority) {
     thread->next = NULL;
@@ -210,17 +213,45 @@ void thread_sleep(thread_control_block_t *thread, uint32_t requested_time) {
 
     if (!sleeping_thread_queue) {
         sleeping_thread_queue = thread;
-        yield();
-        unlock_scheduler();
-        return;
-    }
+    } else {
+        thread_control_block_t *current_sleep_head = sleeping_thread_queue;
 
-    thread_control_block_t *current_sleep_head = sleeping_thread_queue;
-    while (current_sleep_head->next) {
-        current_sleep_head = current_sleep_head->next;
-    }
+        while (current_sleep_head->next) {
+            current_sleep_head = current_sleep_head->next;
+        }
 
-    current_sleep_head->next = thread;
+        current_sleep_head->next = thread;
+    }
     yield();
     unlock_scheduler();
+}
+
+void thread_exit() {
+    lock_scheduler();
+    thread_control_block_t *thread = get_current_thread();
+    thread->next = NULL;
+    thread->state = THREAD_TERMINATED;
+
+    if (!terminated_thread_queue) {
+        terminated_thread_queue = thread;
+    } else {
+        thread_control_block_t *current_terminated_head =
+            terminated_thread_queue;
+
+        while (current_terminated_head->next) {
+            current_terminated_head = current_terminated_head->next;
+        }
+
+        current_terminated_head->next = thread;
+    }
+    yield();
+    unlock_scheduler();
+}
+
+thread_control_block_t *get_terminated_thread_queue() {
+    return terminated_thread_queue;
+}
+
+void set_terminated_thread_queue(thread_control_block_t *new_queue) {
+    terminated_thread_queue = new_queue;
 }

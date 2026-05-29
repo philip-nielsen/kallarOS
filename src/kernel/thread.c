@@ -8,9 +8,34 @@
 
 static thread_control_block_t *current_thread;
 static thread_control_block_t *idle_thread;
-static uint32_t id;
+static uint32_t id = 1;
+
+static void cleaner_task() {
+    unlock_scheduler();
+    for (;;) {
+        lock_scheduler();
+        thread_control_block_t *terminated_thread_queue =
+            get_terminated_thread_queue();
+
+        if (terminated_thread_queue) {
+            set_terminated_thread_queue(NULL);
+        }
+
+        unlock_scheduler();
+        while (terminated_thread_queue) {
+            printf("\nTERMINATE THREAD %d\n", terminated_thread_queue->id);
+            thread_control_block_t *tmp = terminated_thread_queue->next;
+            kfree((uint32_t)terminated_thread_queue->stack_base);
+            kfree((uint32_t)terminated_thread_queue);
+            terminated_thread_queue = tmp;
+        }
+
+        thread_sleep(get_current_thread(), 2000);
+    }
+}
 
 static void idle_thread_method() {
+    unlock_scheduler();
     for (;;) {
         __asm__ volatile("hlt");
     }
@@ -39,14 +64,17 @@ void initialize_multitasking() {
     idle_stack[3] = 0;     // pop ebp
     idle_stack[4] = 0x202; // popfd (EFLAGS with interrupts enabled)
     idle_stack[5] = (uint32_t)idle_thread_method; // ret
+    idle_stack[6] = (uint32_t)thread_exit;
 
     idle_thread->esp = (void *)idle_stack;
     idle_thread->stack_base = (void *)idle_stack_base;
     idle_thread->state = THREAD_READY;
     idle_thread->time_used = 0;
     idle_thread->priority = 2;
-    idle_thread->id = 255;
+    idle_thread->id = UINT32_MAX - 1;
     idle_thread->remaining_time = 0;
+
+    create_kernel_thread(cleaner_task);
 }
 
 void create_kernel_thread(void (*entry_point)()) {
@@ -62,6 +90,7 @@ void create_kernel_thread(void (*entry_point)()) {
     stack[3] = 0;                     // pop ebp
     stack[4] = 0x202;                 // popfd (EFLAGS with interrupts enabled)
     stack[5] = (uint32_t)entry_point; // ret
+    stack[6] = (uint32_t)thread_exit;
 
     new_thread->esp = (void *)stack;
     new_thread->stack_base = (void *)stack_base;
