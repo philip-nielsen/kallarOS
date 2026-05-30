@@ -2,7 +2,7 @@
 #include <kernel/panic.h>
 #include <libc/stdio.h>
 #include <stdint.h>
-#include <tests/tests.h>
+#include <util/tests.h>
 
 void kmalloc_run_test() {
     uint32_t address1 = kmalloc(1000);
