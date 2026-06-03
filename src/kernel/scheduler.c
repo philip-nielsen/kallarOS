@@ -71,7 +71,7 @@ void yield() {
     }
 
     if (IRQ_disable_counter == 0) {
-        printf("\nYielding without lock protection!\n");
+        pr("\nYielding without lock protection!\n");
     }
 
     thread_control_block_t *prev = get_current_thread();
@@ -109,6 +109,10 @@ void lock_scheduler() {
 
 void unlock_scheduler() {
 #ifndef SMP
+    if (IRQ_disable_counter == 0) {
+        printf("unlock_scheduler underflow\n");
+        return;
+    }
     IRQ_disable_counter--;
     if (IRQ_disable_counter == 0) {
         __asm__ volatile("sti");

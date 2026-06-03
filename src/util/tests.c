@@ -20,11 +20,11 @@ void task_a() {
         acquire_mutex(vga_mutex);
         for (int j = 0; j < 10; j++) {
             pr("A");
-            __asm__("nop");
-            __asm__("nop");
-            __asm__("nop");
-            __asm__("nop");
-            __asm__("nop");
+            __asm__ volatile("nop");
+            __asm__ volatile("nop");
+            __asm__ volatile("nop");
+            __asm__ volatile("nop");
+            __asm__ volatile("nop");
         }
         thread_sleep(get_current_thread(), 2);
         release_mutex(vga_mutex);
@@ -38,11 +38,11 @@ void task_b() {
         acquire_mutex(vga_mutex);
         for (int j = 0; j < 10; j++) {
             pr("B");
-            __asm__("nop");
-            __asm__("nop");
-            __asm__("nop");
-            __asm__("nop");
-            __asm__("nop");
+            __asm__ volatile("nop");
+            __asm__ volatile("nop");
+            __asm__ volatile("nop");
+            __asm__ volatile("nop");
+            __asm__ volatile("nop");
         }
         thread_sleep(get_current_thread(), 1);
         release_mutex(vga_mutex);

@@ -179,7 +179,9 @@ void release_semaphore(semaphore_t *semaphore) {
         enqueue_thread(thread, thread->priority);
         yield();
     } else {
-        semaphore->current_count--;
+        if (semaphore->current_count > 0) {
+            semaphore->current_count--;
+        }
     }
     unlock_atomic();
 }
