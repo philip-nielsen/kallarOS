@@ -1,5 +1,6 @@
 #include <arch/i386/apic.h>
 #include <arch/i386/pit.h>
+#include <kernel/scheduler.h>
 #include <stdint.h>
 
 // Tthe memory address of the APIC's End Of Interrupt (EOI) register
@@ -18,6 +19,9 @@
 #define APIC_LVT_INT_MASKED 0x10000          // Bit 16
 #define APIC_LVT_TIMER_MODE_PERIODIC 0x20000 // Bit 17
 
+// IDT vector used for the APIC
+#define APIC_VECTOR 200
+
 volatile uint64_t system_ticks = 0;
 
 void apic_timer_handler() {
@@ -25,6 +29,8 @@ void apic_timer_handler() {
 
     // Acknowledge the interrupt so the APIC sends the next one
     apic_write(APIC_REGISTER_EOI, 0);
+
+    scheduler_on_tick();
 }
 
 void apic_write(uint32_t reg, uint32_t value) {
@@ -59,9 +65,10 @@ void apic_start_timer() {
 
     // Start internal APIC timer as periodic on IDT vector 200, divider 16,
     // using calibrated ticks
-    apic_write(APIC_REGISTER_LVT_TIMER, 200 | APIC_LVT_TIMER_MODE_PERIODIC);
+    apic_write(APIC_REGISTER_LVT_TIMER,
+               APIC_VECTOR | APIC_LVT_TIMER_MODE_PERIODIC);
     apic_write(APIC_REGISTER_TIMER_DIV, 0x3);
     apic_write(APIC_REGISTER_TIMER_INITCNT, ticksIn10ms);
 }
 
-uint64_t apic_get_ticks(void) { return system_ticks; }
+uint64_t apic_get_ticks() { return system_ticks; }

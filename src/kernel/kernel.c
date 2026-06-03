@@ -8,9 +8,11 @@
 #include <kernel/kmalloc.h>
 #include <kernel/panic.h>
 #include <kernel/pmm.h>
+#include <kernel/scheduler.h>
+#include <kernel/thread.h>
 #include <kernel/timer.h>
 #include <libc/stdio.h>
-#include <tests/tests.h>
+#include <util/tests.h>
 
 #include <stdint.h>
 
@@ -54,6 +56,12 @@ int kmain(multiboot_info_t *mbd, uint32_t magic) {
     printf("Checking kernel heap\n");
     kmalloc_init();
     kmalloc_run_test();
+
+    initialize_multitasking();
+    printf("Multitasking initialized\n");
+
+    printf("Checking multitasking\n");
+    multitasking_run_test();
 
     uint32_t uptime_seconds = 0;
     char spinner[] = {'|', '/', '-', '\\'};
