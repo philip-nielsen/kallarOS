@@ -12,9 +12,9 @@
 /* From Jonas Skeppstedt, best teacher :)
  * the funny do-while next clearly performs one iteration of the loop.
  * if you are really curious about why there is a loop, please check
- * the course book about the C preprocessor where it is explained. it
- * is to avoid bugs and/or syntax errors in case you use the pr in an
- * if-statement without { }.
+ * the course book (Writing Efficient C Code) about the C preprocessor where it
+ * is explained. it is to avoid bugs and/or syntax errors in case you use the pr
+ * in an if-statement without { }.
  *
  */
 #if PRINT

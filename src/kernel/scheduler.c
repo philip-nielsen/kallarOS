@@ -171,8 +171,6 @@ void scheduler_on_tick() {
 
     current_thread->time_used += 1;
     current_thread->remaining_time -= 1;
-    // pr("\nthread %d, to with remaining time %d\n", current_thread->id,
-    //    current_thread->remaining_time);
 
     if (current_thread->remaining_time <= 0) {
         if (current_thread->priority >= 1) {

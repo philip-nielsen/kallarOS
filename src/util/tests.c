@@ -1,8 +1,126 @@
+#define PRINT 0
+
 #include <kernel/kmalloc.h>
 #include <kernel/panic.h>
+#include <kernel/scheduler.h>
+#include <kernel/thread.h>
 #include <libc/stdio.h>
-#include <stdint.h>
+#include <util/debug.h>
 #include <util/tests.h>
+
+#include <stdint.h>
+
+mutex_t *vga_mutex;
+semaphore_t *bouncer_sem;
+semaphore_t *test_barrier_sem;
+
+void task_a() {
+    unlock_scheduler();
+    for (int i = 0; i < 2; i++) {
+        acquire_mutex(vga_mutex);
+        for (int j = 0; j < 10; j++) {
+            pr("A");
+            __asm__("nop");
+            __asm__("nop");
+            __asm__("nop");
+            __asm__("nop");
+            __asm__("nop");
+        }
+        thread_sleep(get_current_thread(), 2);
+        release_mutex(vga_mutex);
+    }
+    release_semaphore(test_barrier_sem);
+}
+
+void task_b() {
+    unlock_scheduler();
+    for (int i = 0; i < 2; i++) {
+        acquire_mutex(vga_mutex);
+        for (int j = 0; j < 10; j++) {
+            pr("B");
+            __asm__("nop");
+            __asm__("nop");
+            __asm__("nop");
+            __asm__("nop");
+            __asm__("nop");
+        }
+        thread_sleep(get_current_thread(), 1);
+        release_mutex(vga_mutex);
+    }
+    release_semaphore(test_barrier_sem);
+}
+
+void task_1() {
+    unlock_scheduler();
+    for (int i = 0; i < 2; i++) {
+        acquire_semaphore(bouncer_sem);
+        pr("\n1\n");
+        thread_sleep(get_current_thread(), 2);
+        release_semaphore(bouncer_sem);
+    }
+    release_semaphore(test_barrier_sem);
+}
+
+void task_2() {
+    unlock_scheduler();
+    for (int i = 0; i < 2; i++) {
+        acquire_semaphore(bouncer_sem);
+        pr("2\n");
+        thread_sleep(get_current_thread(), 2);
+        release_semaphore(bouncer_sem);
+    }
+    release_semaphore(test_barrier_sem);
+}
+
+void task_3() {
+    unlock_scheduler();
+    for (int i = 0; i < 2; i++) {
+        acquire_semaphore(bouncer_sem);
+        pr("\n3\n");
+        thread_sleep(get_current_thread(), 2);
+        release_semaphore(bouncer_sem);
+    }
+    release_semaphore(test_barrier_sem);
+}
+
+void task_4() {
+    unlock_scheduler();
+    for (int i = 0; i < 2; i++) {
+        acquire_semaphore(bouncer_sem);
+        pr("4\n");
+        thread_sleep(get_current_thread(), 2);
+        release_semaphore(bouncer_sem);
+    }
+    release_semaphore(test_barrier_sem);
+}
+
+void multitasking_run_test() {
+    vga_mutex = create_mutex();
+    bouncer_sem = create_semaphore(2);
+    test_barrier_sem = create_semaphore(6);
+
+    for (int i = 0; i < 6; i++) {
+        acquire_semaphore(test_barrier_sem);
+    }
+
+    create_kernel_thread(task_1);
+    create_kernel_thread(task_2);
+    create_kernel_thread(task_3);
+    create_kernel_thread(task_4);
+
+    create_kernel_thread(task_a);
+    create_kernel_thread(task_b);
+
+    for (int i = 0; i < 6; i++) {
+        acquire_semaphore(test_barrier_sem);
+    }
+
+    kfree((uint32_t)vga_mutex);
+    kfree((uint32_t)bouncer_sem);
+    kfree((uint32_t)test_barrier_sem);
+
+    printf("Multitasking tests passed!\n");
+}
 
 void kmalloc_run_test() {
     uint32_t address1 = kmalloc(1000);

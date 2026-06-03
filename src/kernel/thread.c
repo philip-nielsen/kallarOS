@@ -1,4 +1,4 @@
-#define PRINT 1
+#define PRINT 0
 
 #include <arch/i386/apic.h>
 #include <kernel/kmalloc.h>
