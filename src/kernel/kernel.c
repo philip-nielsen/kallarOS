@@ -12,25 +12,85 @@
 #include <kernel/thread.h>
 #include <kernel/timer.h>
 #include <libc/stdio.h>
-#include <tests/tests.h>
+#include <util/tests.h>
 
 #include <stdint.h>
 
 extern uint32_t kernel_end;
+mutex_t *vga_mutex;
+semaphore_t *bouncer_sem;
 
 void task_a() {
     unlock_scheduler();
     for (;;) {
-        printf("A");
-        thread_sleep(get_current_thread(), 50);
+        acquire_mutex(vga_mutex);
+        for (int i = 0; i < 10; i++) {
+            printf("A");
+            __asm__("nop");
+            __asm__("nop");
+            __asm__("nop");
+            __asm__("nop");
+            __asm__("nop");
+        }
+        thread_sleep(get_current_thread(), 200);
+        release_mutex(vga_mutex);
     }
 }
 
 void task_b() {
     unlock_scheduler();
     for (;;) {
-        printf("B");
+        acquire_mutex(vga_mutex);
+        for (int i = 0; i < 10; i++) {
+            printf("B");
+            __asm__("nop");
+            __asm__("nop");
+            __asm__("nop");
+            __asm__("nop");
+            __asm__("nop");
+        }
         thread_sleep(get_current_thread(), 100);
+        release_mutex(vga_mutex);
+    }
+}
+
+void task_1() {
+    unlock_scheduler();
+    for (;;) {
+        acquire_semaphore(bouncer_sem);
+        printf("\n1\n");
+        thread_sleep(get_current_thread(), 20);
+        release_semaphore(bouncer_sem);
+    }
+}
+
+void task_2() {
+    unlock_scheduler();
+    for (;;) {
+        acquire_semaphore(bouncer_sem);
+        printf("2\n");
+        thread_sleep(get_current_thread(), 20);
+        release_semaphore(bouncer_sem);
+    }
+}
+
+void task_3() {
+    unlock_scheduler();
+    for (;;) {
+        acquire_semaphore(bouncer_sem);
+        printf("\n3\n");
+        thread_sleep(get_current_thread(), 20);
+        release_semaphore(bouncer_sem);
+    }
+}
+
+void task_4() {
+    unlock_scheduler();
+    for (;;) {
+        acquire_semaphore(bouncer_sem);
+        printf("4\n");
+        thread_sleep(get_current_thread(), 20);
+        release_semaphore(bouncer_sem);
     }
 }
 
@@ -83,6 +143,14 @@ int kmain(multiboot_info_t *mbd, uint32_t magic) {
 
     initialize_multitasking();
     printf("Multitasking initialized\n");
+
+    vga_mutex = create_mutex();
+    bouncer_sem = create_semaphore(2);
+
+    create_kernel_thread(task_1);
+    create_kernel_thread(task_2);
+    create_kernel_thread(task_3);
+    create_kernel_thread(task_4);
 
     create_kernel_thread(task_a);
     create_kernel_thread(task_b);

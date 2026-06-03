@@ -19,6 +19,10 @@ void lock_scheduler(void);
 
 void unlock_scheduler(void);
 
+void lock_atomic(void);
+
+void unlock_atomic(void);
+
 void enqueue_thread(thread_control_block_t *thread, uint8_t thread_priority);
 
 thread_control_block_t *dequeue_thread(void);

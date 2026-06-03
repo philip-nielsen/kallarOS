@@ -1,3 +1,5 @@
+#define PRINT 1
+
 #include <arch/i386/apic.h>
 #include <kernel/kmalloc.h>
 #include <kernel/scheduler.h>
@@ -5,6 +7,7 @@
 #include <kernel/timer.h>
 #include <libc/stdio.h>
 #include <stdint.h>
+#include <util/debug.h>
 
 static thread_control_block_t *current_thread;
 static thread_control_block_t *idle_thread;
@@ -23,7 +26,7 @@ static void cleaner_task() {
 
         unlock_scheduler();
         while (terminated_thread_queue) {
-            printf("\nTERMINATE THREAD %d\n", terminated_thread_queue->id);
+            pr("\nTERMINATE THREAD %d\n", terminated_thread_queue->id);
             thread_control_block_t *tmp = terminated_thread_queue->next;
             kfree((uint32_t)terminated_thread_queue->stack_base);
             kfree((uint32_t)terminated_thread_queue);
@@ -110,3 +113,89 @@ void set_current_thread(thread_control_block_t *new_thread) {
 }
 
 thread_control_block_t *get_idle_thread() { return idle_thread; }
+
+semaphore_t *create_semaphore(uint16_t max_count) {
+    semaphore_t *new_semaphore = (semaphore_t *)kmalloc(sizeof(semaphore_t));
+    new_semaphore->max_count = max_count;
+    new_semaphore->current_count = 0;
+    new_semaphore->first_waiting_thread = NULL;
+    new_semaphore->last_waiting_thread = NULL;
+
+    return new_semaphore;
+}
+
+mutex_t *create_mutex() {
+    mutex_t *new_mutex = (mutex_t *)kmalloc(sizeof(mutex_t));
+    new_mutex->owner_thread = NULL;
+    new_mutex->first_waiting_thread = NULL;
+    new_mutex->last_waiting_thread = NULL;
+
+    return new_mutex;
+}
+
+void acquire_semaphore(semaphore_t *semaphore) {
+    lock_atomic();
+    if (semaphore->current_count < semaphore->max_count) {
+        semaphore->current_count++;
+    } else {
+        current_thread->next = NULL;
+        if (!semaphore->first_waiting_thread) {
+            semaphore->first_waiting_thread = current_thread;
+        } else {
+            semaphore->last_waiting_thread->next = current_thread;
+        }
+        semaphore->last_waiting_thread = current_thread;
+        current_thread->state = THREAD_BLOCKED;
+        yield();
+    }
+    unlock_atomic();
+}
+
+void acquire_mutex(mutex_t *mutex) {
+    lock_atomic();
+    if (!mutex->owner_thread) {
+        mutex->owner_thread = current_thread;
+    } else {
+        current_thread->next = NULL;
+        if (!mutex->first_waiting_thread) {
+            mutex->first_waiting_thread = current_thread;
+        } else {
+            mutex->last_waiting_thread->next = current_thread;
+        }
+        mutex->last_waiting_thread = current_thread;
+        current_thread->state = THREAD_BLOCKED;
+        yield();
+    }
+    unlock_atomic();
+}
+
+void release_semaphore(semaphore_t *semaphore) {
+    lock_atomic();
+
+    if (semaphore->first_waiting_thread) {
+        thread_control_block_t *thread = semaphore->first_waiting_thread;
+        thread->state = THREAD_READY;
+        semaphore->first_waiting_thread = thread->next;
+        enqueue_thread(thread, thread->priority);
+        yield();
+    } else {
+        semaphore->current_count--;
+    }
+    unlock_atomic();
+}
+
+void release_mutex(mutex_t *mutex) {
+    lock_atomic();
+    if (!mutex->first_waiting_thread) {
+        mutex->owner_thread = NULL;
+    } else {
+        thread_control_block_t *next_thread = mutex->first_waiting_thread;
+        mutex->first_waiting_thread = mutex->first_waiting_thread->next;
+
+        next_thread->state = THREAD_READY;
+        enqueue_thread(next_thread, next_thread->priority);
+        mutex->owner_thread = next_thread;
+        yield();
+    }
+    unlock_atomic();
+}
