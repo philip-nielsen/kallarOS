@@ -61,6 +61,7 @@ typedef struct semaphore {
  * @owner_thread: Thread currently holding the lock.
  * @first_waiting_thread: Head of the blocked threads queue.
  * @last_waiting_thread: Tail of the blocked threads queue.
+ */
 typedef struct mutex {
     thread_control_block_t *owner_thread;
     thread_control_block_t *first_waiting_thread;

@@ -52,8 +52,6 @@ void reset_queues() {
             thread_control_block_t *next_in_line =
                 first_ready_to_run_thread_list[i]->next;
             first_ready_to_run_thread_list[i]->remaining_time = FIRST_LIMIT;
-            pr("\nMoving back thread %d to top\n",
-               first_ready_to_run_thread_list[i]->id);
             enqueue_thread(first_ready_to_run_thread_list[i], 0);
 
             first_ready_to_run_thread_list[i] = next_in_line;
@@ -110,9 +108,10 @@ void lock_scheduler() {
 void unlock_scheduler() {
 #ifndef SMP
     if (IRQ_disable_counter == 0) {
-        printf("unlock_scheduler underflow\n");
+        pr("unlock_scheduler underflow\n");
         return;
     }
+
     IRQ_disable_counter--;
     if (IRQ_disable_counter == 0) {
         __asm__ volatile("sti");
@@ -184,14 +183,11 @@ void scheduler_on_tick() {
             current_thread->remaining_time = SECOND_LIMIT;
             current_thread->priority++;
         }
-        pr("\nmoving thread %d, to priority to %d\n", current_thread->id,
-           current_thread->priority);
         needs_yield = 1;
     }
     counter++;
 
     if (counter >= 100) {
-        pr("\nreset\n");
         reset_queues();
         needs_yield = 1;
 
@@ -248,7 +244,6 @@ void thread_exit() {
         current_terminated_head->next = thread;
     }
     yield();
-    unlock_scheduler();
 }
 
 thread_control_block_t *get_terminated_thread_queue() {
