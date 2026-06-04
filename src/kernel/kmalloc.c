@@ -135,7 +135,7 @@ void kfree(uint32_t address) {
     if (prev != 0) {
         uint32_t prev_size = prev->size_and_flags & ~0x1;
         if ((uint32_t)prev + prev_size == (uint32_t)current) {
-            prev->size_and_flags += (current_size);
+            prev->size_and_flags += (current->size_and_flags & ~0x1);
             prev->next_free_slot = current->next_free_slot;
         }
     }
