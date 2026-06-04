@@ -33,7 +33,7 @@ static void cleaner_task() {
             terminated_thread_queue = tmp;
         }
 
-        thread_sleep(get_current_thread(), 2000);
+        thread_sleep(2000);
     }
 }
 

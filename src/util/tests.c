@@ -26,7 +26,7 @@ void task_a() {
             __asm__ volatile("nop");
             __asm__ volatile("nop");
         }
-        thread_sleep(get_current_thread(), 2);
+        thread_sleep(2);
         release_mutex(vga_mutex);
     }
     release_semaphore(test_barrier_sem);
@@ -44,7 +44,7 @@ void task_b() {
             __asm__ volatile("nop");
             __asm__ volatile("nop");
         }
-        thread_sleep(get_current_thread(), 1);
+        thread_sleep(1);
         release_mutex(vga_mutex);
     }
     release_semaphore(test_barrier_sem);
@@ -55,7 +55,7 @@ void task_1() {
     for (int i = 0; i < 2; i++) {
         acquire_semaphore(bouncer_sem);
         pr("\n1\n");
-        thread_sleep(get_current_thread(), 2);
+        thread_sleep(2);
         release_semaphore(bouncer_sem);
     }
     release_semaphore(test_barrier_sem);
@@ -66,7 +66,7 @@ void task_2() {
     for (int i = 0; i < 2; i++) {
         acquire_semaphore(bouncer_sem);
         pr("2\n");
-        thread_sleep(get_current_thread(), 2);
+        thread_sleep(2);
         release_semaphore(bouncer_sem);
     }
     release_semaphore(test_barrier_sem);
@@ -77,7 +77,7 @@ void task_3() {
     for (int i = 0; i < 2; i++) {
         acquire_semaphore(bouncer_sem);
         pr("\n3\n");
-        thread_sleep(get_current_thread(), 2);
+        thread_sleep(2);
         release_semaphore(bouncer_sem);
     }
     release_semaphore(test_barrier_sem);
@@ -88,7 +88,7 @@ void task_4() {
     for (int i = 0; i < 2; i++) {
         acquire_semaphore(bouncer_sem);
         pr("4\n");
-        thread_sleep(get_current_thread(), 2);
+        thread_sleep(2);
         release_semaphore(bouncer_sem);
     }
     release_semaphore(test_barrier_sem);

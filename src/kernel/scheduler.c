@@ -204,8 +204,9 @@ void scheduler_on_tick() {
     }
 }
 
-void thread_sleep(thread_control_block_t *thread, uint32_t requested_time) {
+void thread_sleep(uint32_t requested_time) {
     lock_scheduler();
+    thread_control_block_t *thread = get_current_thread();
     thread->next = NULL;
     thread->wake_time = apic_get_ticks() + requested_time;
     thread->state = THREAD_SLEEPING;

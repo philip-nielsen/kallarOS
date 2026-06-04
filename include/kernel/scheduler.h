@@ -58,11 +58,10 @@ thread_control_block_t *dequeue_thread(void);
 void scheduler_on_tick(void);
 
 /**
- * thread_sleep() - Puts the given thread to sleep for a specific duration.
- * @thread: Pointer to the thread control block.
+ * thread_sleep() - Puts the current thread to sleep for a specific duration.
  * @requested_time: Minimum APIC ticks to sleep before awaking.
  */
-void thread_sleep(thread_control_block_t *thread, uint32_t requested_time);
+void thread_sleep(uint32_t requested_time);
 
 /**
  * thread_exit() - Terminates the active thread and moves it to the graveyard.
