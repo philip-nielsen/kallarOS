@@ -25,6 +25,7 @@ typedef enum thread_state {
  * @time_used: Total CPU ticks consumed.
  * @wake_time: Target tick for awaking from a sleep state.
  * @id: Unique thread identifier.
+ * @saved_interrupt_state: The EFLAGS register saved during scheduler locks.
  * @priority: MLFQ priority level (0 is highest).
  * @remaining_time: Ticks left in the current time slice.
  */
@@ -38,6 +39,7 @@ typedef struct thread_control_block {
     uint32_t time_used;
     uint64_t wake_time;
     uint32_t id;
+    uint32_t saved_interrupt_state;
     uint8_t priority;
     int8_t remaining_time;
 } thread_control_block_t;

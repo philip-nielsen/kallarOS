@@ -54,6 +54,7 @@ void initialize_multitasking() {
     root_thread->time_used = 0;
     root_thread->priority = 0;
     root_thread->remaining_time = FIRST_LIMIT;
+    root_thread->saved_interrupt_state = 0x202;
     current_thread = root_thread;
 
     idle_thread =
@@ -76,6 +77,7 @@ void initialize_multitasking() {
     idle_thread->priority = 2;
     idle_thread->id = UINT32_MAX - 1;
     idle_thread->remaining_time = 0;
+    idle_thread->saved_interrupt_state = 0x202;
 
     create_kernel_thread(cleaner_task);
 }
@@ -102,6 +104,7 @@ void create_kernel_thread(void (*entry_point)()) {
     new_thread->priority = 0;
     new_thread->id = ++id;
     new_thread->remaining_time = FIRST_LIMIT;
+    new_thread->saved_interrupt_state = 0x202;
 
     enqueue_thread(new_thread, 0);
 }

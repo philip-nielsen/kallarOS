@@ -100,7 +100,16 @@ void yield() {
 
 void lock_scheduler() {
 #ifndef SMP
-    __asm__ volatile("cli");
+    uint32_t current_eflags;
+    __asm__ volatile("pushfl\n\t"
+                     "pop %0"
+                     : "=r"(current_eflags)::"memory");
+    __asm__ volatile("cli" ::: "memory");
+
+    if (IRQ_disable_counter == 0) {
+        get_current_thread()->saved_interrupt_state = current_eflags;
+    }
+
     IRQ_disable_counter++;
 #endif
 }
@@ -113,8 +122,12 @@ void unlock_scheduler() {
     }
 
     IRQ_disable_counter--;
+
     if (IRQ_disable_counter == 0) {
-        __asm__ volatile("sti");
+        __asm__ volatile(
+            "push %0\n\t"
+            "popfl" ::"r"(get_current_thread()->saved_interrupt_state)
+            : "memory", "cc");
     }
 #endif
 }
