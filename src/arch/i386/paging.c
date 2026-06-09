@@ -10,6 +10,7 @@
 
 static page_directory_entry_t *kernel_directory = 0;
 static uint8_t paging_enabled = 0;
+static uint16_t ref_counter[1024];
 
 void map_page(uint32_t virt_addr, uint32_t phys_addr, uint32_t flags) {
     uint32_t dir_index = virt_addr >> 22;
@@ -30,6 +31,10 @@ void map_page(uint32_t virt_addr, uint32_t phys_addr, uint32_t flags) {
                              : "memory");
 
             memset((void *)RECURSIVE_TABLE_PTR(dir_index), 0, PAGE_SIZE);
+        }
+
+        if (!(RECURSIVE_TABLE_PTR(dir_index)[tab_index] & PTE_PRESENT)) {
+            ref_counter[dir_index]++;
         }
 
         RECURSIVE_TABLE_PTR(dir_index)[tab_index] = phys_addr | flags;
@@ -93,6 +98,7 @@ void free_page(uint32_t virt_addr) {
     uint32_t frame_phys =
         RECURSIVE_TABLE_PTR(dir_index)[tab_index] & PTE_FRAME_MASK;
     pmm_free_frame(frame_phys);
+
     unmap_page(virt_addr);
 }
 
@@ -111,6 +117,17 @@ void unmap_page(uint32_t virt_addr) {
     if (RECURSIVE_TABLE_PTR(dir_index)[tab_index] & PTE_PRESENT) {
         RECURSIVE_TABLE_PTR(dir_index)[tab_index] = 0x0;
         __asm__ volatile("invlpg (%0)" ::"r"(virt_addr) : "memory");
+
+        ref_counter[dir_index]--;
+    }
+
+    if (ref_counter[dir_index] == 0 && dir_index < 768) {
+        uint32_t pt_phys = RECURSIVE_DIR_PTR[dir_index] & PTE_FRAME_MASK;
+        pmm_free_frame(pt_phys);
+        RECURSIVE_DIR_PTR[dir_index] = 0x0;
+
+        __asm__ volatile("invlpg (%0)" ::"r"(RECURSIVE_TABLE_PTR(dir_index))
+                         : "memory");
     }
 }
 

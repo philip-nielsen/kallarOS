@@ -37,14 +37,6 @@ void paging_init(void);
 void map_page(uint32_t virt_addr, uint32_t phys_addr, uint32_t flags);
 
 /**
- * unmap_page() - Unmaps a specific virtual address.
- * @virt_addr: The virtual address to unmap.
- *
- * Context: Panics if the virtual address is not present in the page directory.
- */
-void unmap_page(uint32_t virt_addr);
-
-/**
  * alloc_page() - Allocates and maps a new physical frame to a virtual address.
  * @virt_addr: The virtual address to be mapped.
  * @flags: The PTE flags to set for this page.
@@ -54,5 +46,22 @@ void unmap_page(uint32_t virt_addr);
  * mapped.
  */
 void alloc_page(uint32_t virt_addr, uint32_t flags);
+
+/**
+ * free_page() - Unmaps a specific virtual address and frees its physical frame.
+ * @virt_addr: The virtual address to unmap and free.
+ *
+ * Context: Panics if either the Page Directory Entry or the Page Table Entry
+ * is not present.
+ */
+void free_page(uint32_t virt_addr);
+
+/**
+ * unmap_page() - Unmaps a specific virtual address.
+ * @virt_addr: The virtual address to unmap.
+ *
+ * Context: Panics if the virtual address is not present in the page directory.
+ */
+void unmap_page(uint32_t virt_addr);
 
 #endif
