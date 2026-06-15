@@ -32,11 +32,14 @@ os.iso: kernel.elf
 		-o os.iso                       \
 		iso
 
-run: os.iso
-	qemu-system-i386 -boot d -cdrom os.iso -m 4096 -no-reboot -s -d int,cpu_reset -D qemu.log
+disk.img:
+	qemu-img create -f raw disk.img 100M
 
-debug: os.iso
-	qemu-system-i386 -boot d -cdrom os.iso -m 4096 -no-reboot -s -S -d int,cpu_reset -D qemu.log
+run: os.iso disk.img
+	qemu-system-i386 -boot d -cdrom os.iso -m 4096 -no-reboot -s -d int,cpu_reset -drive file=disk.img,format=raw,index=0,media=disk -D qemu.log
+
+debug: os.iso disk.img
+	qemu-system-i386 -boot d -cdrom os.iso -m 4096 -no-reboot -s -S -d int,cpu_reset -drive file=disk.img,format=raw,index=0,media=disk -D qemu.log
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -46,4 +49,4 @@ debug: os.iso
 
 clean:
 	find src -type f -name '*.o' -delete
-	rm -rf kernel.elf os.iso iso/boot/kernel.elf qemu.log
+	rm -rf kernel.elf os.iso iso/boot/kernel.elf qemu.log disk.img

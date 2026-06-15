@@ -9,3 +9,9 @@ uint8_t inb(uint16_t port) {
     __asm__ volatile("inb %1, %0" : "=a"(result) : "Nd"(port));
     return result;
 }
+
+uint16_t inw(uint16_t port) {
+    uint16_t result;
+    __asm__ volatile("inw %w1, %w0" : "=a"(result) : "Nd"(port));
+    return result;
+}

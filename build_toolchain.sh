@@ -5,16 +5,24 @@ set -e
 
 echo "Starting KallarOS Environment Setup..."
 
-if ! command -v apt-get &> /dev/null; then
-    echo "Error: 'apt-get' not found."
-    echo "This script strictly requires a Debian/Ubuntu-based Linux distribution."
+echo "Detecting package manager and installing dependencies (sudo required)..."
+
+if command -v apt-get &> /dev/null; then
+    echo "Detected apt. Updating and installing Debian/Ubuntu dependencies..."
+    sudo apt-get update
+    sudo apt-get install -y build-essential bison flex libgmp3-dev libmpc-dev \
+                            libmpfr-dev texinfo curl nasm genisoimage qemu-system-x86
+
+elif command -v dnf &> /dev/null; then
+    echo "Detected dnf. Installing Fedora/Nobara dependencies..."
+    sudo dnf install -y @development-tools bison flex gmp-devel libmpc-devel \
+                        mpfr-devel texinfo curl nasm genisoimage qemu-system-x86
+
+else
+    echo "Error: Neither 'apt-get' nor 'dnf' found."
+    echo "This script requires a Debian/Ubuntu or Fedora-based Linux distribution."
     exit 1
 fi
-
-echo "Installing dependencies(sudo required)..."
-sudo apt-get update
-sudo apt-get install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo curl \
-                        nasm genisoimage qemu-system-x86
 
 export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf
@@ -24,10 +32,10 @@ mkdir -p ~/src
 cd ~/src
 
 echo "Starting i686-elf cross-compiler build..."
-echo "This will take some time to complete"
-echo "As to speed up the building of GCC, it will using all available threads"
+echo "This will take some time to complete."
+echo "To speed up the building of GCC, it will use all available threads."
 
-echo "Downloading Binutils (2.41) and GCC(13.2.0)..."
+echo "Downloading Binutils (2.41) and GCC (13.2.0)..."
 if [ ! -f "binutils-2.41.tar.gz" ]; then
     curl -O https://ftp.gnu.org/gnu/binutils/binutils-2.41.tar.gz
 fi

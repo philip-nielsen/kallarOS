@@ -4,6 +4,7 @@
 #include <arch/i386/io.h>
 #include <arch/i386/multiboot.h>
 #include <arch/i386/paging.h>
+#include <drivers/ata.h>
 #include <drivers/vga.h>
 #include <kernel/kmalloc.h>
 #include <kernel/panic.h>
@@ -65,6 +66,10 @@ int kmain(multiboot_info_t *mbd, uint32_t magic) {
 
     uint32_t uptime_seconds = 0;
     char spinner[] = {'|', '/', '-', '\\'};
+
+    printf("\n");
+    identify_disk();
+    printf("\n");
 
     printf("System Uptime: \n");
 

@@ -18,4 +18,12 @@ void outb(uint16_t port, uint8_t data);
  */
 uint8_t inb(uint16_t port);
 
+/**
+ * inw() - Reads the current data from the given I/O port.
+ * @port: The 16-bit I/O port to read from.
+ *
+ * Return: The 16-bit value read from the specified port.
+ */
+uint16_t inw(uint16_t port);
+
 #endif
