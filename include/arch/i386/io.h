@@ -26,4 +26,11 @@ uint8_t inb(uint16_t port);
  */
 uint16_t inw(uint16_t port);
 
+/**
+ * outw() - Sends the given data to the given I/O port.
+ * @port: The 16-bit I/O port to write to.
+ * @data: The 16-bit value to send to the port.
+ */
+void outw(uint16_t port, uint16_t data);
+
 #endif

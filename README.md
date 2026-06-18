@@ -4,7 +4,7 @@ A hobby x86 32-bit operating system built from scratch in C and assembly. The go
 
 Currently, the kernel successfully boots into a fully paged virtual memory environment, complete with physical/virtual memory allocators, hardware interrupts (IDT/PIC), an APIC system timer, and a basic VGA text-mode driver.
 
-The OS now supports multitasking with a MLFQ scheduler. The next steps are to implement a disk driver, a file system and user space with system calls.
+The OS now supports multitasking with a MLFQ scheduler. The next steps are to implement a file system and user space with system calls.
 
 ![Screenshot of OS booting in QEMU](kallaros.png)
 
@@ -57,7 +57,7 @@ void some_function() {
 - [x] Memory Management (Physical RAM & Paging)
 - [x] Kernel Heap (`kmalloc` & `kfree`)
 - [x] Multitasking (MLFQ Scheduler & mutexes)
-- [ ] Disk Driver (ATA)
+- [x] Disk Driver (ATA)
 - [ ] File System (FAT32/ext2)
 - [ ] User Space (Ring 3) & System Calls
 - [ ] ELF Loader (Running actual programs!)

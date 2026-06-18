@@ -27,6 +27,9 @@ int kmain(multiboot_info_t *mbd, uint32_t magic) {
     idt_init();
     printf("IDT initialized\n");
 
+    uint16_t identify_buffer[256];
+    identify_disk(identify_buffer);
+
     mbd = (multiboot_info_t *)((uint32_t)mbd + 0xC0000000);
 
     /* Make sure the magic number matches for memory mapping*/
@@ -64,12 +67,10 @@ int kmain(multiboot_info_t *mbd, uint32_t magic) {
     printf("Checking multitasking\n");
     multitasking_run_test();
 
+    ata_test();
+
     uint32_t uptime_seconds = 0;
     char spinner[] = {'|', '/', '-', '\\'};
-
-    printf("\n");
-    identify_disk();
-    printf("\n");
 
     printf("System Uptime: \n");
 

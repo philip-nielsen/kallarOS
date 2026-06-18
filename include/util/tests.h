@@ -2,7 +2,7 @@
 #define TESTS_H
 
 /**
- * kmalloc_run_test() - Runs some tests for multitasking.
+ * multitasking_run_test() - Runs some tests for multitasking.
  * Tests thread creating, mutexes and semaphores.
  */
 void multitasking_run_test(void);
@@ -13,5 +13,11 @@ void multitasking_run_test(void);
  * Context: Causes Kernel Panic if the tests fails.
  */
 void kmalloc_run_test(void);
+
+/**
+ * ata_test() - Runs a write read loopback test.
+ * Context: Causes Kernel Panic if the tests fails.
+ */
+void ata_test(void);
 
 #endif

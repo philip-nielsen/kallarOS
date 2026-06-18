@@ -1,5 +1,6 @@
 #define PRINT 0
 
+#include <drivers/ata.h>
 #include <kernel/kmalloc.h>
 #include <kernel/panic.h>
 #include <kernel/scheduler.h>
@@ -177,4 +178,25 @@ void kmalloc_run_test() {
     kfree(massive_ptr);
 
     printf("All Heap Tests Passed!\n");
+}
+
+void ata_test() {
+    uint16_t buffer[512];
+    for (int i = 0; i < 512; i++) {
+        buffer[i] = i;
+    }
+
+    uint16_t new_buffer[512] = {0};
+    write_sectors(2, 2, buffer);
+    read_sectors(2, 2, new_buffer);
+    int test_passed = 1;
+    for (int i = 0; i < 512; i++) {
+        if (new_buffer[i] != i) {
+            printf("ATA Test Failed at index %d!\n", i);
+            panic("TA Test Failed");
+        }
+    }
+    if (test_passed) {
+        printf("ATA Read/Write Loopback Successful!\n");
+    }
 }
